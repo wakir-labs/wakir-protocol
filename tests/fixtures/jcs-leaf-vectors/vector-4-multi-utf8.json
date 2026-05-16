@@ -1,7 +1,7 @@
 {
-  "_spdx": "SPDX-License-Identifier: Apache-2.0",
-  "_copyright": "Copyright (c) 2026 Callandor GmbH and contributors",
-  "_notes": "Vector 4: multi-byte UTF-8 in the payload. The payload was 'Über die Brücke gehen — Πέρασμα — 橋を渡る' inside a comment field. Tests that JCS round-trips non-ASCII characters byte-stably and that downstream JSON encoders do not silently re-escape (e.g. ASCII-only mode would mutate the digest).",
+  "x-spdx-license-identifier": "Apache-2.0",
+  "x-spdx-file-copyright-text": "2026 Callandor GmbH and contributors",
+  "_notes": "Vector 4: multi-byte UTF-8 in the payload. The payload was '\u00dcber die Br\u00fccke gehen \u2014 \u03a0\u03ad\u03c1\u03b1\u03c3\u03bc\u03b1 \u2014 \u6a4b\u3092\u6e21\u308b' inside a comment field. Tests that JCS round-trips non-ASCII characters byte-stably and that downstream JSON encoders do not silently re-escape (e.g. ASCII-only mode would mutate the digest).",
   "input": {
     "event_id": "01HK4P8X3W2N5Q9V0R6T7S8YZ4",
     "time": "2026-05-06T12:03:00Z",
