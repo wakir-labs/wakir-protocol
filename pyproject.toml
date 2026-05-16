@@ -1,0 +1,58 @@
+[project]
+name = "wakir-protocol"
+version = "0.1.0"
+description = "Wakir Protocol — Wirelang specs, capability tokens, identity substrate (Apache-2.0 + CC-BY-4.0)"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.10"
+authors = [
+  { name = "Callandor GmbH and contributors" },
+]
+keywords = [
+  "wirelang",
+  "capability-token",
+  "biscuit",
+  "aip",
+  "did",
+  "identity-substrate",
+  "json-schema",
+  "wakir",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security :: Cryptography",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "jsonschema>=4.21",
+  "rfc8785>=0.1.4",
+  "cryptography>=42",
+  "shamir-mnemonic>=0.3",
+  "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=7.4",
+  "hypothesis>=6.92",
+]
+
+[project.urls]
+Homepage = "https://wakir.dev/"
+Repository = "https://github.com/wakir-labs/wakir-protocol"
+Issues = "https://github.com/wakir-labs/wakir-protocol/issues"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["wakir_protocol*"]
+exclude = ["tests*"]

@@ -1,0 +1,28 @@
+version = 1
+SPDX-PackageName = "wakir-protocol"
+SPDX-PackageSupplier = "Callandor GmbH <legal@callandor.eu>"
+SPDX-PackageDownloadLocation = "https://github.com/wakir-labs/wakir-protocol"
+
+[[annotations]]
+path = ["**.py"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["wakir_protocol/schemas/**.json", "wakir_protocol/examples/**.json", "tests/fixtures/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
+SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["docs/**.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
+SPDX-License-Identifier = "CC-BY-4.0"
+
+[[annotations]]
+path = ["README.md", "NOTICE", "LICENSE", "LICENSES/**", "REUSE.toml", "pyproject.toml", ".gitignore"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
+SPDX-License-Identifier = "Apache-2.0"
