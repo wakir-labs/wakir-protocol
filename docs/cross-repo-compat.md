@@ -167,7 +167,7 @@ File `tooling/compat/compat-allowlist.json`:
       "path": "wakir_protocol/schemas/wakir-inclusion-proof-v1.json",
       "reason": "why the mirror is allowed to lag",
       "until": "2026-09-30",
-      "tracking": "https://github.com/wakir-labs/wakir-protocol/pull/5"
+      "tracking": "https://github.com/wakir-labs/wakir-protocol/pull/6"
     }
   ]
 }
