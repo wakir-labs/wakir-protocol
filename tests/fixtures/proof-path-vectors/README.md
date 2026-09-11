@@ -9,9 +9,10 @@ are meant to be loaded by all three repositories:
   re-computation from first principles: `hashlib` + RFC 8785 JCS)
 
 They exist so that the three implementations cannot drift apart without
-a test going red (ADR-0072 Phase 4, sub-item 4c). The vectors were
-generated with `wakir_verify.merkle_proof` and re-derived independently
-by the protocol smoke test.
+a test going red (ADR-0072 Phase 4, sub-item 4c). The vectors are
+re-derived from first principles by the protocol smoke test and driven
+through both counterpart implementations by the `compat` gate
+(`tooling/compat/run_vectors_with.py`, see `docs/cross-repo-compat.md`).
 
 ## Hash rules (derived from the shipped Merkle code)
 
@@ -42,26 +43,39 @@ leaves[]      the four-field leaf tuples, in tree order
 leaf_hashes[] hex leaf hashes (same order)
 levels[][]    every tree level post-duplication, bottom-up; levels[-1] == [merkle_root]
 merkle_root   hex
+manifest      a wakir-wat-manifest/v1 instance for the same tree, shaped
+              like the runtime aggregator output (version, hour_slot,
+              merkle_root, event_count, events == leaves rows with
+              leaf_hash, tree_levels, build_time, prev_hour_root: null);
+              validates against wakir-wat-manifest-v1.json and loads
+              with wakir_verify.manifest.load_manifest_from_dict
 proofs[]      one wakir-inclusion-proof/v1 document per leaf
 expected[]    {leaf_index, verified} — all true
 tampered      (vector-3 only) {leaf, leaf_hash, proof, expected_verified: false}
 ```
 
-Each `proofs[]` entry validates against
-`wakir_protocol/schemas/wakir-inclusion-proof-v1.json`. That schema is a
-stub until the runtime-side draft from Phase-4 W2 is merged in W4; the
-stub pins exactly the fields the vectors use.
+Each `proofs[]` entry validates against the canonical
+`wakir_protocol/schemas/wakir-inclusion-proof-v1.json`
+(`additionalProperties: false`; `manifest_version` is the manifest's
+`version`, `hour` its `hour_slot`). The schema's `examples` are
+`vector-1.proofs[0]` and `vector-2.proofs[2]`.
+
+Leaf rows use 64-hex `capability_token_hash` values only: the Merkle
+leaf rule permits the empty string, but `wakir-wat-manifest-v1.json`
+requires a 64-hex digest per manifest event row, and the same leaves
+serve as both. The empty-string leaf case stays covered by
+`tests/fixtures/jcs-leaf-vectors/vector-3-no-capability-token.json`.
 
 ## Regenerating
 
-The vectors are deterministic. To regenerate from the verifier
-implementation:
+The vectors are deterministic. The reference recomputation lives in
+`tests/test_proof_path_vectors.py` and in
+`tooling/compat/run_vectors_with.py --impl reference`; to check a
+counterpart checkout against them:
 
 ```text
-PYTHONPATH=<wakir-verify checkout> python3 - <<'PY'
-from wakir_verify import merkle_proof as mp
-# see tests/test_proof_path_vectors.py for the reference recomputation
-PY
+python3 tooling/compat/run_vectors_with.py --impl runtime <wakir-runtime checkout>
+python3 tooling/compat/run_vectors_with.py --impl verify  <wakir-verify checkout>
 ```
 
 Do not regenerate to "fix" a red test — a mismatch means one of the

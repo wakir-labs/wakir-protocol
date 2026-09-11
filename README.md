@@ -33,8 +33,10 @@ major-version bump.
   version-pinned and accompanied by test vectors under
   `tests/fixtures/`. The shared proof-path Merkle vectors
   (`tests/fixtures/proof-path-vectors/`) are consumed by all three
-  repositories; `wakir-inclusion-proof-v1.json` is the (stub) schema
-  for the proof document they carry.
+  repositories; `wakir-inclusion-proof-v1.json` is the canonical
+  schema for the proof document they carry. The cross-repo `compat`
+  gate that keeps runtime and verify aligned with this schema set is
+  described in [`docs/cross-repo-compat.md`](docs/cross-repo-compat.md).
 - **Capability-token envelope** — the Layer-3 wrapper around
   AIP + Biscuit, specified in
   [`docs/layer-3-capability-token-spec.md`](docs/layer-3-capability-token-spec.md).
@@ -123,8 +125,13 @@ same major number and stay backwards-compatible. The currently
 shipped schemas are:
 
 - `aip-document` — AIP identity document
-- `wat-manifest-v2` — WAT hourly manifest (consumed by
-  `wakir-verify` and the runtime's `wakir-wat-verify`)
+- `wakir-wat-manifest-v1` — WAT hourly manifest, `wakir-wat-manifest/v1`
+  (emitted by the runtime aggregator, read by `wakir-verify`)
+- `wakir-inclusion-proof-v1` — self-contained Merkle inclusion proof,
+  `wakir-inclusion-proof/v1` (emitted by the runtime proof path,
+  validated by `wakir-verify`)
+- `wat-manifest-v2` — WAT hourly manifest v2 (multi-capability envelope;
+  not on the proof path)
 - `wirelang-layer-0` / `-1` / `-2` / `-3` — Wirelang layer schemas
 - `recovery-drill` — recovery-drill projection
 - `federation-trust-document` — cross-organisation trust posture

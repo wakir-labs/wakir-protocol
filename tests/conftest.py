@@ -21,9 +21,16 @@ from __future__ import annotations
 import asyncio
 import inspect
 import json
+import sys
 from pathlib import Path
 
 import pytest
+
+# Make ``tooling.compat`` importable from the tests (the package is repo
+# tooling, not part of the installed ``wakir_protocol`` distribution).
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 
 # ---------------------------------------------------------------------------

@@ -18,8 +18,11 @@ Invariants covered:
 - single-leaf tree: root == leaf, empty sibling path
 - every recorded proof reconstructs the recorded root
 - the tampered leaf in vector-3 does NOT reconstruct the root
-- every proof document validates against the wakir-inclusion-proof/v1
-  schema stub
+- every proof document validates against the canonical
+  wakir-inclusion-proof/v1 schema (additionalProperties: false)
+- every vector carries a wakir-wat-manifest/v1 manifest instance that
+  validates against the manifest schema and agrees with the tree
+- the schema's examples are real vector proofs, not placeholders
 """
 
 from __future__ import annotations
@@ -39,6 +42,7 @@ SCHEMA_PATH = (
     / "schemas"
     / "wakir-inclusion-proof-v1.json"
 )
+MANIFEST_SCHEMA_PATH = SCHEMA_PATH.with_name("wakir-wat-manifest-v1.json")
 VECTOR_FILES = ["vector-1.json", "vector-2.json", "vector-3.json"]
 LEAF_KEYS = ("event_id", "time", "payload_hash", "capability_token_hash")
 
@@ -93,6 +97,13 @@ def schema_validator() -> jsonschema.Draft202012Validator:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
     jsonschema.Draft202012Validator.check_schema(schema)
     return jsonschema.Draft202012Validator(schema)
+
+
+@pytest.fixture(scope="module")
+def manifest_validator() -> jsonschema.Draft202012Validator:
+    schema = json.loads(MANIFEST_SCHEMA_PATH.read_text(encoding="utf-8"))
+    jsonschema.Draft202012Validator.check_schema(schema)
+    return jsonschema.Draft202012Validator(schema, format_checker=jsonschema.FormatChecker())
 
 
 def _load(name: str) -> dict:
@@ -179,3 +190,70 @@ def test_hash_rules_are_documented_in_every_vector() -> None:
         assert rules["hash"] == "sha256"
         for key in ("leaf", "inner", "odd_level", "sibling_side"):
             assert rules[key], key
+
+
+# ---------------------------------------------------------------------------
+# Canonical schema + manifest level (Phase-4 W4)
+# ---------------------------------------------------------------------------
+
+
+def test_inclusion_proof_schema_is_canonical_not_stub() -> None:
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    assert "x-status" not in schema
+    assert schema["x-canonical-home"] == "wakir-protocol"
+    assert schema["$id"] == "https://wakir.dev/wirelang/schema/wakir-inclusion-proof-v1/0.1.0"
+    assert schema["additionalProperties"] is False
+    assert schema["properties"]["siblings"]["items"]["additionalProperties"] is False
+    assert set(schema["required"]) == {
+        "schema", "manifest_version", "merkle_root", "leaf_hash", "leaf_index", "leaf_count", "siblings",
+    }
+
+
+def test_schema_examples_are_real_vector_proofs(schema_validator) -> None:
+    schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+    examples = schema["examples"]
+    assert len(examples) == 2
+    for example in examples:
+        schema_validator.validate(example)
+    assert examples[0] == _load("vector-1.json")["proofs"][0]
+    assert examples[1] == _load("vector-2.json")["proofs"][2]
+
+
+@pytest.mark.parametrize("name", VECTOR_FILES)
+def test_unknown_proof_field_is_rejected(name: str, schema_validator) -> None:
+    proof = dict(_load(name)["proofs"][0], verdict=True)
+    with pytest.raises(jsonschema.ValidationError):
+        schema_validator.validate(proof)
+
+
+@pytest.mark.parametrize("name", VECTOR_FILES)
+def test_manifest_instance_validates_and_matches_tree(name: str, manifest_validator) -> None:
+    vec = _load(name)
+    manifest = vec["manifest"]
+    manifest_validator.validate(manifest)
+    assert manifest["version"] == "wakir-wat-manifest/v1"
+    assert manifest["merkle_root"] == vec["merkle_root"]
+    assert manifest["event_count"] == len(vec["leaves"])
+    assert [e["leaf_hash"] for e in manifest["events"]] == vec["leaf_hashes"]
+    assert manifest["leaves"] == manifest["events"]
+    assert manifest["tree_levels"] == vec["levels"]
+    for entry, leaf in zip(manifest["events"], vec["leaves"]):
+        assert {k: entry[k] for k in LEAF_KEYS} == leaf
+    for proof in vec["proofs"]:
+        assert proof["manifest_version"] == manifest["version"]
+        assert proof["hour"] == manifest["hour_slot"]
+        assert proof["event_id"] == manifest["events"][proof["leaf_index"]]["event_id"]
+
+
+@pytest.mark.parametrize("name", VECTOR_FILES)
+def test_manifest_leaf_rows_satisfy_schema_hash_patterns(name: str) -> None:
+    """The manifest schema requires 64-hex capability_token_hash per event row.
+
+    The Merkle leaf rule permits the empty string; the shared vectors
+    therefore only use non-empty capability hashes so that the same
+    leaves are valid both as tree input and as manifest rows. The
+    empty-string leaf rule is covered by jcs-leaf-vectors/vector-3.
+    """
+    for leaf in _load(name)["leaves"]:
+        assert len(leaf["capability_token_hash"]) == 64
+        assert len(leaf["payload_hash"]) == 64

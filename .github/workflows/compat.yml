@@ -1,0 +1,164 @@
+# SPDX-FileCopyrightText: 2026 Callandor GmbH and contributors
+# SPDX-License-Identifier: Apache-2.0
+#
+# compat — cross-repo compatibility gate (ADR-0072 Phase 4, sub-item 4c).
+#
+# wakir-protocol is the canonical home of the JSON schema set, the shared
+# proof-path test vectors and the wakir-inclusion-proof/v1 format.
+# wakir-runtime and wakir-verify consume them. This job proves, on every
+# PR and on every push to main, that the schema set in *this* tree is
+# still consumed correctly by runtime@main and verify@main:
+#
+#   1. mirror check — canonical JCS digest (tooling/compat/canon.py) of
+#      every mirrored schema/vector against the counterpart clone; drift
+#      or a missing required mirror fails unless covered by a valid,
+#      dated allowlist entry (tooling/compat/compat-allowlist.json);
+#   2. the counterparts' own Merkle implementations are driven over the
+#      PR's vectors (tooling/compat/run_vectors_with.py);
+#   3. the PR's schemas and vectors are overlaid into the counterpart
+#      clones and the counterparts' schema/vector-consuming tests run
+#      against them.
+#
+# Enforce is on by default (Priya §8 trade-off 4). No path filter: a
+# required status check must always produce a result.
+#
+# Job display name (Branch-Protection required context):
+#   compat (runtime + verify consume this schema set)
+
+name: compat
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compat:
+    name: compat (runtime + verify consume this schema set)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout wakir-protocol (this ref)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Checkout wakir-runtime@main (depth 1)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: wakir-labs/wakir-runtime
+          ref: main
+          path: _counterparts/runtime
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Checkout wakir-verify@main (depth 1)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: wakir-labs/wakir-verify
+          ref: main
+          path: _counterparts/verify
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.13"
+
+      - name: Install protocol and counterpart test dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[test]"
+          python -m pip install -e "_counterparts/runtime[test]"
+          python -m pip install -e "_counterparts/verify[test]"
+          git -C _counterparts/runtime log --oneline -1
+          git -C _counterparts/verify log --oneline -1
+
+      - name: Canonical schema digests of this tree
+        run: |
+          python tooling/compat/canonical_schema_digest.py --rule
+          python tooling/compat/canonical_schema_digest.py
+
+      - name: Mirror check against runtime@main
+        run: python tooling/compat/check_mirror.py --repo runtime _counterparts/runtime
+
+      - name: Mirror check against verify@main
+        run: python tooling/compat/check_mirror.py --repo verify _counterparts/verify
+
+      - name: Proof-path vectors through runtime's Merkle implementation
+        run: python tooling/compat/run_vectors_with.py --impl runtime _counterparts/runtime
+
+      - name: Proof-path vectors through verify's Merkle implementation and manifest loader
+        run: python tooling/compat/run_vectors_with.py --impl verify _counterparts/verify
+
+      - name: Overlay this tree's schemas and vectors into the counterparts
+        run: |
+          set -euo pipefail
+          cp wakir_protocol/schemas/*.json _counterparts/runtime/wirelang/schemas/
+          for pack in proof-path-vectors jcs-leaf-vectors aip-document-vectors bip32-vectors \
+                      did-document-vectors slip0010-ed25519-vectors wakir-ftd-vectors; do
+            mkdir -p "_counterparts/runtime/tests/fixtures/${pack}"
+            cp tests/fixtures/${pack}/*.json "_counterparts/runtime/tests/fixtures/${pack}/"
+          done
+          mkdir -p _counterparts/verify/tests/fixtures/proof-path-vectors
+          cp tests/fixtures/proof-path-vectors/*.json _counterparts/verify/tests/fixtures/proof-path-vectors/
+          git -C _counterparts/runtime status --short | head -50
+          git -C _counterparts/verify status --short
+
+      - name: runtime tests that consume the schema set (with overlay)
+        working-directory: _counterparts/runtime
+        run: |
+          set -euo pipefail
+          fixed="tests/wat/test_merkle.py
+                 tests/wat/test_hash_consistency.py
+                 tests/wat/test_manifest_v1_schema_smoke.py
+                 tests/wat/test_manifest_v2_schema_smoke.py
+                 tests/wat/test_manifest_signing_schema.py
+                 tests/scripts/test_demo_proof.py
+                 wirelang/tests/test_layer_0_transport.py
+                 wirelang/tests/test_layer_1_wire.py
+                 wirelang/tests/test_layer_2_semantic.py
+                 wirelang/tests/test_layer_3_capability_token.py
+                 wirelang/tests/test_aip_document_golden.py
+                 wirelang/tests/test_datalog_caveat_schema.py
+                 wirelang/tests/test_ftd_verifier.py
+                 wirelang/tests/test_persona_v2_schema.py
+                 wirelang/tests/test_federation_caveat_override_event_export_schema.py
+                 wirelang/tests/persona_engine/test_format_conformance.py"
+          # any counterpart test that loads the shared proof-path vectors is picked up automatically
+          dynamic="$(grep -rl --include='*.py' 'proof-path-vectors' tests wirelang/tests 2>/dev/null || true)"
+          selected=""
+          for f in $fixed $dynamic; do
+            if [ -f "$f" ]; then selected="$selected $f"; else echo "skip (absent): $f"; fi
+          done
+          echo "selected:$selected"
+          # COXSR-03/04 pin the *byte* digest of runtime's own copy of
+          # caveat-override-event-export.json (OTS anchor fixture). A mirror
+          # that may differ in x-spdx-*/description cannot satisfy a byte pin;
+          # see docs/cross-repo-compat.md §4.1 (Zone 3 follow-up).
+          deselect="--deselect wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_03_anchor_manifest_well_formed \
+                    --deselect wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_04_schema_digest_fixture_round_trips"
+          # shellcheck disable=SC2086
+          python -m pytest $selected $deselect -p no:cacheprovider -o addopts="" -q
+
+      - name: verify tests that consume the vectors (with overlay)
+        working-directory: _counterparts/verify
+        run: |
+          set -euo pipefail
+          fixed="tests/test_merkle_proof.py tests/test_manifest.py"
+          dynamic="$(grep -rl --include='*.py' 'proof-path-vectors' tests 2>/dev/null || true)"
+          selected=""
+          for f in $fixed $dynamic; do
+            if [ -f "$f" ]; then selected="$selected $f"; else echo "skip (absent): $f"; fi
+          done
+          echo "selected:$selected"
+          # shellcheck disable=SC2086
+          python -m pytest $selected -p no:cacheprovider -o addopts="" -q

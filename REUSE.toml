@@ -26,3 +26,9 @@ path = ["README.md", "NOTICE", "LICENSE", "LICENSES/**", "REUSE.toml", "pyprojec
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
 SPDX-License-Identifier = "Apache-2.0"
+
+[[annotations]]
+path = ["tooling/**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Callandor GmbH and contributors"
+SPDX-License-Identifier = "Apache-2.0"
