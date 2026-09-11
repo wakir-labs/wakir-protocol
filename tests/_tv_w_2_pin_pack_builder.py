@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""TV-W-2 capability-token multi-step pin-pack builder (Phase-1b Tag-16).
+"""TV-W-2 capability-token multi-step pin-pack builder.
 
 Implements the deterministic builder for the TV-W-2 vector specified
 in ``wirelang/specs/wirelang-tv-strategy.md`` §2 and pin-stabilised by
@@ -138,7 +138,7 @@ CONTEXT_AUDIENCE: dict = {
 
 
 # ---------------------------------------------------------------------------
-# JCS resolver indirection (Tag-9)
+# JCS resolver indirection
 # ---------------------------------------------------------------------------
 
 
@@ -552,7 +552,7 @@ def build_pin_pack(*, seed_hex: str = TV_W_2_TEST_SEED_HEX) -> dict:
 
     return {
         "label": "tv-w-2-capability-token-multi-step",
-        "spec": "wirelang/specs/wirelang-tv-strategy.md §2 (Phase-1b Tag-16)",
+        "spec": "wirelang/specs/wirelang-tv-strategy.md §2",
         "csc_spec": "wirelang/specs/datalog-caveat-vocabulary-phase-2.md §4 + §6",
         "seed_hex": seed_hex,
         "issuer_persona": [TV_W_2_ISSUER_PERSONA_IDX, TV_W_2_ISSUER_SPAWN_COUNTER],

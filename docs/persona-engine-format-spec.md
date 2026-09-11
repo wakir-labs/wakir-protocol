@@ -15,8 +15,8 @@ license: CC-BY-4.0
 |---|---|
 | Spec ID | PEF-1 |
 | Owner | pengine-eng (ADR-0043) |
-| Phase | 1b Sprint-Pengine-7 Tag-4 (2026-05-14) |
-| Self-Migration anchor | ADR-0036 (Self-Migration-Konverter) — Sprint-Pengine-7 Tag-2 converter consumes this spec; Tag-3 added §3.7.3 migrate-version mechanic; Tag-4 adds §3.7.4 recovery-workflow + §3.7.5 state-persistence-backing trait (impl-axis for the Tag-3 spec-level recovery-drill pattern). |
+| Phase | 1b this revision (2026-05-14) |
+| Self-Migration anchor | ADR-0036 (Self-Migration-Konverter) — converter consumes this spec; An earlier increment added §3.7.3 migrate-version mechanic; This revision adds §3.7.4 recovery-workflow + §3.7.5 state-persistence-backing trait (impl-axis for the spec-level recovery-drill pattern). |
 | Companion specs | `persona-hash-spec.md` (V-907), `self-migration-konverter-spec.md`, `persona-schema-v10-migration-vorbereitung.md`, `schema-registry-spec.md` v0.32.0 §10, `recovery-drill-leaf-projection.md` (WAT bridge) |
 | Cross-review zones | J (container-bridge spec, container-ops-slot), K (WAT-bridge / V-907 hash integration, wat-eng-slot), L (identity-substrate forward-link, identity-eng-slot), B (NATS-KV × Wirelang, drain protocol), HR (governance-revision, hr-slot) |
 | Status of ratification | v1.3: additive-only minor bump on top of v1.2 (HR-slot bedingt-ack 2026-05-13 carries; no governance gate re-opened). §3.7.4 recovery-workflow and §3.7.5 state-persistence-backing trait are operator/runtime-facing surfaces layered over the byte-unchanged JSON envelope. Cross-Review-Zones touched in spec-form (J Quadlet restart semantics, L SPIFFE SVID refresh, B NATS-KV restore). |
@@ -25,14 +25,14 @@ license: CC-BY-4.0
 
 | Version | Date | Change |
 |---|---|---|
-| 1.0.0 | 2026-05-13 (AM) | Initial Sprint-Pengine-7 Tag-1 spec (PR #22, `86c9acc`). |
-| 1.1.0 | 2026-05-13 (PM) | Tag-2 cut-over: Aisha-HR-Counter-Vorschlag 1 eingearbeitet als `synthesis_default_exceptions` table in §4.3 (cfo + internal-audit `reports_to`/`escalation` → `aufsichtsrat`). Counter-Vorschläge 2 (per-transaction budget cap) and 3 (`identity_pinned_policy_version`) recorded as OI-PEF-7 / OI-PEF-8 (future items, not Tag-2 blockers). |
-| 1.2.0 | 2026-05-13 (EVE) | Tag-3 spawn-lifecycle concretisation: new §3.7 lifecycle protocols layered on §3.3 state machine — §3.7.1 `despawn_clean` (four phase-sequential operations P1..P4: NATS-KV drain, capability-token revocation, final marker compose, container stop; idempotence + failure modes), §3.7.2 `recovery_drill` pattern (three failure classes: container crash, NATS bucket lost, SPIRE SVID expired; four acceptance criteria: hash pre/post, audit-trail gap = 0, capability continuity, 30s budget), §3.7.3 `migrate_version` mechanic (trigger conditions, backward-compat guarantees, hash-pin-drift detection, per-instance sequence with rollback window). Bisheriges §3.7 (JSON-Schema) → §3.8. JSON envelope (§3.3 `spawn_lifecycle`, §3.4 `state_persistence`, §3.5 `container_bridge`, §3.6 `migration_metadata`) **byte-unchanged** — Tag-3 adds spec-level operator protocols, not new JSON fields. |
-| 1.3.0 | 2026-05-14 | Tag-4 recovery-lifecycle impl-axis: new §3.7.4 `recovery_workflow` (three trigger detection modes: crash-detected, despawn-mid-operation, state-corruption; four phase-sequential operations R1..R4: detect → reload → re-register → resume; idempotence under retry; failure-mode matrix), §3.7.5 `PersonaStateBacking` trait surface (backend-agnostic state-persistence contract; NATS-KV is one binding, in-memory is the second for hermetic test; surfaces: snapshot/restore/list-snapshots/atomic-swap). JSON envelope **byte-unchanged**. Crate surface: pure-data + trait, no async, no I/O — same posture as Tag-3 `lifecycle_protocols`. |
+| 1.0.0 | 2026-05-13 (AM) | Initial this revision spec (PR #22, `86c9acc`). |
+| 1.1.0 | 2026-05-13 (PM) | An earlier increment cut-over: HR counter-proposal 1 eingearbeitet als `synthesis_default_exceptions` table in §4.3 (cfo + internal-audit `reports_to`/`escalation` → `aufsichtsrat`). Counter-Vorschläge 2 (per-transaction budget cap) and 3 (`identity_pinned_policy_version`) recorded as OI-PEF-7 / OI-PEF-8 (future items, not this revision blockers). |
+| 1.2.0 | 2026-05-13 (EVE) | this revision spawn-lifecycle concretisation: new §3.7 lifecycle protocols layered on §3.3 state machine — §3.7.1 `despawn_clean` (four phase-sequential operations P1..P4: NATS-KV drain, capability-token revocation, final marker compose, container stop; idempotence + failure modes), §3.7.2 `recovery_drill` pattern (three failure classes: container crash, NATS bucket lost, SPIRE SVID expired; four acceptance criteria: hash pre/post, audit-trail gap = 0, capability continuity, 30s budget), §3.7.3 `migrate_version` mechanic (trigger conditions, backward-compat guarantees, hash-pin-drift detection, per-instance sequence with rollback window). Bisheriges §3.7 (JSON-Schema) → §3.8. JSON envelope (§3.3 `spawn_lifecycle`, §3.4 `state_persistence`, §3.5 `container_bridge`, §3.6 `migration_metadata`) **byte-unchanged** — This revision adds spec-level operator protocols, not new JSON fields. |
+| 1.3.0 | 2026-05-14 | this revision recovery-lifecycle impl-axis: new §3.7.4 `recovery_workflow` (three trigger detection modes: crash-detected, despawn-mid-operation, state-corruption; four phase-sequential operations R1..R4: detect → reload → re-register → resume; idempotence under retry; failure-mode matrix), §3.7.5 `PersonaStateBacking` trait surface (backend-agnostic state-persistence contract; NATS-KV is one binding, in-memory is the second for hermetic test; surfaces: snapshot/restore/list-snapshots/atomic-swap). JSON envelope **byte-unchanged**. Crate surface: pure-data + trait, no async, no I/O — same posture as `lifecycle_protocols`. |
 
 ## 0. Purpose and one-paragraph summary
 
-Today the AI-Corp / Wakir Labs runs 13 active personae as
+Today Wakir Labs runs 13 active personae as
 `.claude/agents/<slug>.md` files in the **Claude-Code-Native**
 format: a YAML front-matter (`name`, `description`, plus an
 optional `tools` or `model` field) followed by a Markdown body.
@@ -52,24 +52,24 @@ vectors against the 13 personae we operate today.
 
 The persona-format ecosystem has **three parallel axes**:
 
-| Axis | Versions in flight (Phase-1b Sprint-Pengine-7) | Owner | Anchor |
+| Axis | Versions in flight | Owner | Anchor |
 |---|---|---|---|
 | **A. Claude-Code-Native** (input axis, today) | `persona-claude-native` v0 | Claude-Code spawner contract | `.claude/agents/*.md` files |
 | **B. V-907 mock canonical subset** (hash-input axis) | `persona-v0` (legacy), `persona-v1` (current), `persona-v2` (next) | pengine-eng (V-907) | `wirelang/schemas/persona-v{0,1,2}.json` |
-| **C. Framework-native engine format** (target axis, this spec) | `wakir-persona-v1` (this spec) | pengine-eng (ADR-0043) | `wirelang/schemas/wakir-persona-v1.json` (new in Sprint-Pengine-7 Tag-1) |
+| **C. Framework-native engine format** (target axis, this spec) | `wakir-persona-v1` (this spec) | pengine-eng (ADR-0043) | `wirelang/schemas/wakir-persona-v1.json` |
 
 Axis A is the **production input** the engine actually finds on
 disk today. Axis B is what V-907 pins (the hash-pillar surface).
 Axis C is the **wakir-runtime-native target shape** the engine
 will spawn from after the Self-Migration cut-over.
 
-Sprint-Pengine-7 Tag-1 ships:
+This revision ships:
 - The `wakir-persona-v1` JSON-Schema (axis C target).
 - The byte-deterministic mapping `A → C` (Claude-Native → wakir-persona-v1).
 - The V-907 hash-integration: `wakir-persona-v1` documents
   embed the persona-v1 canonical-subset block verbatim, so the
   V-907 hash function is unchanged at the byte level. (This is
-  the **load-bearing decision** of Sprint-Pengine-7 Tag-1: the
+  the **load-bearing decision** of this revision: the
   framework-native format does not fork V-907; it embeds it.)
 
 ## 2. Axis A — Claude-Code-Native input format (`persona-claude-native`)
@@ -87,7 +87,7 @@ A `.claude/agents/<slug>.md` file is a UTF-8 text document with:
 ```
 
 The front-matter is a YAML mapping with the following
-recognised keys (Phase-1b Sprint-Pengine-7 Tag-1 inventory of
+recognised keys (this revision inventory of
 the 13 active personae):
 
 | Key | Required | Type | Notes |
@@ -114,8 +114,8 @@ a `model_override` field populated from the `model` key.
 
 ### 2.3 JSON-Schema for input validation
 
-`wirelang/schemas/persona-claude-native.json` (Sprint-Pengine-7
-Tag-1, new). The schema validates the front-matter mapping only;
+`wirelang/schemas/persona-claude-native.json` (this revision
+This revision, new). The schema validates the front-matter mapping only;
 the Markdown body is not covered.
 
 ## 3. Axis C — Framework-native target format (`wakir-persona-v1`)
@@ -143,7 +143,7 @@ with the following top-level fields:
 
 The `canonical_subset` object MUST be a valid
 `persona-v1` document under `wirelang/schemas/persona-v1.json`
-(or `persona-v2` once Sprint-3 Tag-2 ratifies it). This is the
+(or `persona-v2` once This revision ratifies it). This is the
 **single source of truth for the V-907 persona-hash**. The
 hash of the `wakir-persona-v1` document is defined as:
 
@@ -192,8 +192,8 @@ posture).
 - `migrated`: schema-version migration in progress; the v_n instance is frozen, the v_{n+1} instance will spawn separately.
 
 The `recovery_policy.source` of `marker-stack-kv-bridge`
-(Sprint-8 Tag-4 `wirelang.federation.marker_stack_kv` backend)
-binds Recovery to event-replay on the Sprint-8 Tag-3 marker-
+(this revision `wirelang.federation.marker_stack_kv` backend)
+binds Recovery to event-replay on the marker-
 composition reducer.
 
 ### 3.4 `state_persistence` — NATS-KV bucket binding
@@ -210,10 +210,10 @@ composition reducer.
 }
 ```
 
-Pattern source: Sprint-8 Tag-4 marker-stack-kv backend
-(`wakir-marker-stack-{org_id}`). Sprint-Pengine-7 Tag-1 reserves
-the bucket-name family; Sprint-Pengine-7 Tag-4 will land the
-backend module (out of Tag-1 scope).
+Pattern source: This revision marker-stack-kv backend
+(`wakir-marker-stack-{org_id}`). This revision reserves
+the bucket-name family; This revision will land the
+backend module (out of scope).
 
 Cross-Review-Zone-B (NATS-KV × Wirelang) **TOUCH**: a new
 bucket-name family `wakir-persona-state-{persona_id}` requires
@@ -238,7 +238,7 @@ Zone-K-J-Hybrid follow-up.
 }
 ```
 
-Sprint-Pengine-7 Tag-1 records the **shape** of the Zone-J
+This revision records the **shape** of the Zone-J
 contract. The implementation (container-ops-slot-side Quadlet
 template) is gated on Zone-J cross-review with container-ops-slot
 (mandated by `pengine.md`
@@ -262,7 +262,7 @@ This block tells the Self-Migration-Konverter (ADR-0036) which
 chain step produced this document and how to walk it forward
 when the engine reaches `wakir-persona-v2`.
 
-### 3.7 Lifecycle protocols (Sprint-Pengine-7 Tag-3, v1.2)
+### 3.7 Lifecycle protocols (v1.2)
 
 The `spawn_lifecycle` envelope in §3.3 fixes the **state machine**
 (six states, nine transitions). §3.7 concretises the three
@@ -286,9 +286,9 @@ A failure in any phase aborts the protocol and surfaces a
 
 | Phase | Operation | Terminal status | Cross-review zone |
 |---|---|---|---|
-| `P1_drain_nats_kv` | NATS-KV bucket drain: stop accepting new state events on `wakir-persona-state-{persona_id}`; allow in-flight events to commit; close the put-stream; emit final `marker-stack-final-compose` event reducing the persona's marker stack to a terminal `DESPAWN_FINAL` verdict (Sprint-8 Tag-3 reducer surface). | `drained` | B (NATS-KV × Wirelang) |
-| `P2_revoke_capability_tokens` | Capability-token revocation: iterate the persona's outstanding capability-token set; emit one `RevokeEvent` per token to the marker-stack with `revocation_reason="persona_despawn"`; await per-event acknowledgement (Sprint-8 Tag-4 NATS-KV-backed `put_marker_stack`). | `revoked` | L (Identity-Substrate) |
-| `P3_final_marker_compose` | Marker-stack final compose: run `reduce_marker_stack` (Sprint-8 Tag-3) over the now-frozen event log; persist the resulting `CompositionVerdict` as the **canonical final audit record** at key `wakir-persona-state-{persona_id}/__final__/composition-verdict`; emit a WAT-frame referencing this verdict for the engine-side audit anchor (V-907 hash unchanged). | `composed` | K (WAT-bridge) |
+| `P1_drain_nats_kv` | NATS-KV bucket drain: stop accepting new state events on `wakir-persona-state-{persona_id}`; allow in-flight events to commit; close the put-stream; emit final `marker-stack-final-compose` event reducing the persona's marker stack to a terminal `DESPAWN_FINAL` verdict (this revision reducer surface). | `drained` | B (NATS-KV × Wirelang) |
+| `P2_revoke_capability_tokens` | Capability-token revocation: iterate the persona's outstanding capability-token set; emit one `RevokeEvent` per token to the marker-stack with `revocation_reason="persona_despawn"`; await per-event acknowledgement (this revision NATS-KV-backed `put_marker_stack`). | `revoked` | L (Identity-Substrate) |
+| `P3_final_marker_compose` | Marker-stack final compose: run `reduce_marker_stack` over the now-frozen event log; persist the resulting `CompositionVerdict` as the **canonical final audit record** at key `wakir-persona-state-{persona_id}/__final__/composition-verdict`; emit a WAT-frame referencing this verdict for the engine-side audit anchor (V-907 hash unchanged). | `composed` | K (WAT-bridge) |
 | `P4_container_stop` | Container stop: signal the Quadlet supervisor to stop the persona container (`systemctl --user stop wakir-persona-{persona_id}.service`); await `inactive (dead)` unit state with `Result=success` (or `Result=exit-code` with rc=0 for `SIGTERM`-on-clean-exit semantics); remove the persona-state directory mount handle. | `stopped` | J (container-bridge) |
 
 The protocol is **phase-sequential** (not transactional and not
@@ -308,10 +308,10 @@ recovery-drill is designed to forbid.
 Each phase MUST be idempotent on retry: re-running `P1_drain_nats_kv`
 on an already-drained bucket is a no-op returning `drained`; re-running
 `P2_revoke_capability_tokens` on an already-revoked token-set raises no
-error and returns `revoked` (Sprint-6 Tag-9 `UnrevokeAuditMarker`
+error and returns `revoked` (this revision `UnrevokeAuditMarker`
 extension does not apply at despawn — revocation at despawn is
 **terminal**, not narrowable); `P3_final_marker_compose` returns the
-same byte-identical `CompositionVerdict` on second-run (Sprint-8 Tag-3
+same byte-identical `CompositionVerdict` on second-run (this revision
 reducer determinism, T-MC-determinism); `P4_container_stop` on an
 already-stopped unit is a `systemctl stop` no-op returning `stopped`.
 
@@ -346,7 +346,7 @@ truly event-replay-driven (per `recovery_policy.kind:
 |---|---|---|---|
 | `DRILL_CONTAINER_CRASH` | Quadlet unit `SIGKILL` mid-run (no `SIGTERM` grace period). | Marker-stack-kv replay from last commit; container restart from pinned image. | Weekly (every Mon 02:00 UTC). |
 | `DRILL_NATS_BUCKET_LOST` | Per-persona bucket `wakir-persona-state-{persona_id}` deleted (simulates NATS-KV catastrophic loss). | Restore from WAT-anchored snapshot (§5.3 `pin-pack-operator-v1` anchor + last-known marker-stack-kv backup). | Monthly (first Mon 02:00 UTC). |
-| `DRILL_SPIRE_SVID_EXPIRED` | SPIFFE workload-API returns expired SVID for the persona's identity-doc binding. | Identity-substrate re-attestation flow (§3.6 forward-link, Reza-Sprint-9 Tag-1 durable-ledger anchor); marker-stack continues unchanged. | Monthly (first Mon 02:30 UTC, 30 min after DRILL_NATS_BUCKET_LOST). |
+| `DRILL_SPIRE_SVID_EXPIRED` | SPIFFE workload-API returns expired SVID for the persona's identity-doc binding. | Identity-substrate re-attestation flow (§3.6 forward-link, the durable-ledger anchor); marker-stack continues unchanged. | Monthly (first Mon 02:30 UTC, 30 min after DRILL_NATS_BUCKET_LOST). |
 
 The three drill classes form a stratified test: `CONTAINER_CRASH`
 exercises the engine-runtime layer, `NATS_BUCKET_LOST` exercises
@@ -372,7 +372,7 @@ A drill is **passed** iff all four invariants hold post-recovery:
    (Zone K). Drift → drill FAILED.
 3. **Capability-token continuity.** Every non-revoked
    capability-token from the pre-drill snapshot MUST verify
-   against the post-recovery N3 chain walker (Sprint-2 Tag-5
+   against the post-recovery N3 chain walker (this revision
    surface). Drift → drill FAILED.
 4. **Container-state convergence within budget.** The
    `recovered → running` transition MUST complete within 30s of
@@ -385,16 +385,16 @@ A drill that FAILS in any criterion MUST surface a
 `RecoveryDrillFailedError` audit annotation, and the persona
 MUST NOT receive new live capability-token mints until the
 operator manually clears the failure (operator-deliberate gate;
-analogous to the Sprint-6 Tag-9 unrevoke flow).
+analogous to the unrevoke flow).
 
 **§3.7.2.3 Drill scheduling and observability.**
 
 Drills are operator-scheduled (Quadlet `OnCalendar=` timers on
-the persona-engine-side; the scheduler is out of Tag-3 scope and
-is Tag-N+ slot). Each drill emits one structured audit record
+the persona-engine-side; the scheduler is out of scope and
+is this revision slot). Each drill emits one structured audit record
 to the persona's marker-stack with `event_kind=recovery_drill`
-and `outcome ∈ {PASSED, FAILED}`. The Sprint-9 Tag-2 durable
-ledger (Reza, in-flight) will anchor drill outcomes into the
+and `outcome ∈ {PASSED, FAILED}`. The durable
+ledger (the Wirelang track, in-flight) will anchor drill outcomes into the
 WAT merkle tree for cross-org-auditable evidence.
 
 #### 3.7.3 `migrate_version` mechanic
@@ -424,7 +424,7 @@ triggered exactly when **all three** of the following hold:
    alone — only the operator-side audit-trail records the
    richer envelope.
 3. **HR-slot governance ratification.** A migration requires
-   explicit HR-slot ratification per Aisha-Cross-Review-Zone
+   explicit HR-slot ratification per HR cross-review zone
    (HR). No migrate-version transition fires without a paired
    `.claude/agents/<slug>.md` audit annotation.
 
@@ -451,7 +451,7 @@ For major bumps (v1.x → v2.0):
 
 - v1.x persona JSON documents are **NOT** valid against the v2.0
   JSON-Schema — a forced re-conversion via the
-  `persona-migration` crate (V0→V1→V2 chain, Sprint-4 Tag-5
+  `persona-migration` crate (V0→V1→V2 chain, this revision
   resolver surface) is mandatory.
 - The V-907 persona-hash WILL drift across v1.x → v2.0 (this is
   the documented pin-pack-drift signal for major bumps).
@@ -502,7 +502,7 @@ held-frozen state. The rollback window closes at the moment
 v2 reaches `running`; at that point the v1 instance is
 authoritatively despawned and only v2 receives live traffic.
 
-#### 3.7.4 `recovery_workflow` (Tag-4, impl-axis pendant of §3.7.2)
+#### 3.7.4 `recovery_workflow` (impl-axis pendant of §3.7.2)
 
 §3.7.2 fixed *what* a drill exercises (failure classes × acceptance
 invariants). §3.7.4 fixes *how* the engine actually performs the
@@ -517,7 +517,7 @@ Recovery is triggered by one of three engine-observable conditions:
 
 | Trigger | Detection point | Detector | Note |
 |---|---|---|---|
-| `CrashDetected` | Quadlet unit transitions to `inactive` while `Result=signal` (SIGKILL / SIGSEGV / OOM). | container-ops-slot (Kai) — Quadlet `OnFailure=wakir-persona-recover@{persona_id}.service`. | Engine-side reaction is the same regardless of which signal hit. |
+| `CrashDetected` | Quadlet unit transitions to `inactive` while `Result=signal` (SIGKILL / SIGSEGV / OOM). | container-ops-slot (DevOps track) — Quadlet `OnFailure=wakir-persona-recover@{persona_id}.service`. | Engine-side reaction is the same regardless of which signal hit. |
 | `DespawnMidOperation` | The engine observes a `despawning` state but the operator-pin-pack's last marker-stack `CompositionVerdict` is **not** `final_compose` — i.e., despawn started but P3 never reached `composed`. | engine-side — startup-time pin-pack reconciliation. | Specifically detects a process killed between §3.7.1 P1 and P3. |
 | `StateCorruption` | On engine startup, the V-907 persona-hash of the loaded `wakir-persona-v1` document drifts from the operator-pin-pack `pin-pack-operator-v1` AND `classify_hash_pin_drift` returns `UnexpectedDriftBug` (§3.7.3.3). | engine-side — startup-time pin-pack reconciliation. | Distinct from `ExpectedMajorBumpDrift` (which triggers §3.7.3 migrate-version, not recovery). |
 
@@ -601,7 +601,7 @@ transition. Drift past the hard cap raises a
 The crate surface exports a `RecoveryFailureMode` enum closed over
 these five cases.
 
-#### 3.7.5 `PersonaStateBacking` — state-persistence trait surface (Tag-4)
+#### 3.7.5 `PersonaStateBacking` — state-persistence trait surface
 
 §3.4 fixed the NATS-KV bucket-name family. §3.7.5 fixes the
 **backend-agnostic trait surface** that the recovery workflow
@@ -667,14 +667,14 @@ The snapshot envelope is **opaque to the trait** — it is the
 recovery workflow's responsibility to JCS-canonicalise the
 contents before hashing. The trait only stores and retrieves bytes.
 
-**§3.7.5.3 Backend bindings (this Tag-4).**
+**§3.7.5.3 Backend bindings (this revision).**
 
-- **`InMemoryPersonaStateBacking`** (this Tag-4, shipped): HashMap
+- **`InMemoryPersonaStateBacking`** (this revision, shipped): HashMap
   per-`persona_id` → `Vec<(u64, PersonaStateSnapshot)>`. Used by
-  hermetic tests and the migration-pilot Tomás-export rehearsal
+  hermetic tests and the migration-pilot WAT-side export rehearsal
   (Schiene B Schritt 8). Byte-deterministic over inputs (JCS
   envelope), thread-unsafe by construction (single-writer assumption).
-- **`NatsKvPersonaStateBacking`** (reserved, deferred to Tag-N+):
+- **`NatsKvPersonaStateBacking`** (reserved, deferred to this revision):
   NATS-JetStream-KV binding using the `wakir-persona-state-{persona_id}`
   bucket-family. Cross-review-zone-B-paired with container-ops-slot
   Quadlet/Compose template. OI-PEF-13 (NEW).
@@ -688,13 +688,13 @@ a live NATS process.
 
 Trait surface is engine-internal — no Zone-J/K/L touch beyond the
 NATS-KV bucket-family already reserved in §3.4. Zone-B touch
-for the eventual NATS-KV binding (Tag-N+); the trait itself is
+for the eventual NATS-KV binding; the trait itself is
 not a Zone-B surface.
 
 ### 3.8 JSON-Schema for output validation
 
-`wirelang/schemas/wakir-persona-v1.json` (Sprint-Pengine-7
-Tag-1, new). Strict — `additionalProperties: false` at every
+`wirelang/schemas/wakir-persona-v1.json` (this revision
+This revision, new). Strict — `additionalProperties: false` at every
 level.
 
 ## 4. Mapping `persona-claude-native` → `wakir-persona-v1`
@@ -731,15 +731,15 @@ input bytes (.claude/agents/<slug>.md)
   → JCS-canonicalise → output bytes
 ```
 
-### 4.3 Synthesised identity_pinned block (Sprint-Pengine-7 Tag-1 default)
+### 4.3 Synthesised identity_pinned block (v1.0 default)
 
 Because the 13 active personae do not carry an `identity_pinned`
 block (axis A is pre-v0), the converter MUST synthesise one.
-Sprint-Pengine-7 Tag-1 fixes the synthesis defaults:
+This revision fixes the synthesis defaults:
 
 ```yaml
 identity_pinned:
-  cross_review_zones: []          # populated from .claude/agents body parse (out of Tag-1 scope; Tag-2 may extract)
+  cross_review_zones: [] # populated from .claude/agents body parse (out of scope; This revision may extract)
   authority:
     push_remote: false             # safe default; persona-specific override via hr-slot ratification
     budget_cap_eur_per_month: 10   # ADR-0001 default cap
@@ -749,56 +749,56 @@ identity_pinned:
     escalation: "mira"             # safe default
 ```
 
-Sprint-Pengine-7 Tag-2 will extend the converter to **parse
+This revision will extend the converter to **parse
 the Markdown body** for `## Hierarchie` / `## Befugnis-Rahmen`
 sections and populate the synthesised defaults with persona-
-specific values. Tag-1 ships only the safe-default synthesis;
+specific values. This revision ships only the safe-default synthesis;
 this is intentionally HR-slot-ratification-pending.
 
-### 4.3.1 `synthesis_default_exceptions` (Aisha-HR Counter-Vorschlag 1, v1.1)
+### 4.3.1 `synthesis_default_exceptions` (HR counter-proposal 1, v1.1)
 
-The Aisha-HR cross-review (2026-05-13, bedingt-ack on v1.0) identified
+The HR cross-review (2026-05-13, bedingt-ack on v1.0) identified
 two personae for which the safe-default `reports_to: "mira"` /
 `escalation: "mira"` is **inhaltlich incorrect** and must be overridden
-in synthesis (before the Tag-2 Markdown-body parser is in place). Both
-personae carry an explicit Aufsichtsrat-reporting line in their
-`.claude/agents/<slug>.md` body that the engine must honour at Tag-2
+in synthesis (before the Markdown-body parser is in place). Both
+personae carry an explicit board-reporting line in their
+`.claude/agents/<slug>.md` body that the engine must honour at this revision
 cut-over rather than silently default away.
 
-The Tag-2 converter MUST consult this hard-coded exceptions table
+The converter MUST consult this hard-coded exceptions table
 before falling back to the safe defaults of §4.3:
 
 | `persona_slug` | `reports_to` | `escalation` | Rationale |
 |---|---|---|---|
-| `cfo` | `aufsichtsrat` | `aufsichtsrat` | Top-Management gleichrangig zur CEO (`cfo.md` §3 Hierarchie): "Berichtet direkt an Aufsichtsrat für Strategy-ADRs und Hard-Stop, an CEO für operative Bündelung." Daniel Mwangi ist nicht Mira-untergeordnet sondern ein peer; AR-direkt für Strategy + Hard-Stop. |
-| `internal-audit` | `aufsichtsrat` | `aufsichtsrat` | Dotted-line zum Aufsichtsrat (`internal-audit.md` §2): "Berichtet direkt an den Aufsichtsrat (Fred). Nicht an die CEO." Henrik Voss ist independent-audit (klassisches Internal-Audit-Modell), nicht CEO-untergeordnet. |
+| `cfo` | `aufsichtsrat` | `aufsichtsrat` | Top-Management gleichrangig zur CEO (`cfo.md` §3 Hierarchie): "Berichtet direkt an supervisory board für Strategy-ADRs und Hard-Stop, an CEO für operative Bündelung." Der CFO ist nicht operator-untergeordnet sondern ein peer; AR-direkt für Strategy + Hard-Stop. |
+| `internal-audit` | `aufsichtsrat` | `aufsichtsrat` | Dotted-line zum supervisory board (`internal-audit.md` §2): "Berichtet direkt an den supervisory board. Nicht an die CEO." Internal Audit ist independent-audit (klassisches Internal-Audit-Modell), nicht CEO-untergeordnet. |
 
 **Semantik:** Diese Tabelle ist eine Hard-Coded Override-Liste im
 Konverter (`persona_engine_format::SYNTHESIS_DEFAULT_EXCEPTIONS`). Sie
-ist explizit pre-Tag-2-Markdown-body-parse — d.h. die Override gilt
+ist explizit pre-existing-Markdown-body-parse — d.h. die Override gilt
 auch wenn der Body-Parser (`OI-PEF-1`) noch nicht implementiert ist.
 Sobald `OI-PEF-1` landet, kann diese Tabelle in Datenform aus dem
 Body extrahiert werden; bis dahin ist sie die maßgebliche Quelle.
 
-**Wartung:** Wenn eine neue Persona mit Aufsichtsrat-direktem Reporting
-geschaffen wird (HR-Domäne, Aisha), MUSS die Tabelle im selben PR
+**Wartung:** Wenn eine neue Persona mit board-direct Reporting
+geschaffen wird (HR domain), MUSS die Tabelle im selben PR
 aktualisiert werden (Cross-Review-Gate HR vor Konverter-Run).
 
 ### 4.3.2 Open Items (HR-Counter-Vorschläge 2-3, v1.1)
 
-Two HR-counter-proposals are recorded as future-items, NOT Tag-2
-blockers, per Aisha-bedingt-ack:
+Two HR-counter-proposals are recorded as future-items, NOT this revision
+blockers, per HR conditional ack:
 
 - **OI-PEF-7** — `budget_cap_eur_per_month` adressiert nur eine
   der zwei ADR-0001-Delegationsmatrix-Dimensionen (single-month
   rolling cap; missing: per-transaction cap, ≤ 20 EUR). Two-dimensional
   schema (`budget_cap_eur_per_month` + `budget_cap_eur_per_transaction`)
-  to be added in `wakir-persona-v1` v2 (Sprint-Pengine-7 Tag-N+).
+  to be added in `wakir-persona-v1` v2 (this revision).
 - **OI-PEF-8** — `identity_pinned_policy_version` field on the
   `migration_metadata` block (§3.6) to record which default-policy
   version was in effect at conversion time. Enables an HR-audit-sweep
   to recognise which persona-documents were synthesised under older
-  defaults (Sprint-Pengine-7 Tag-N+).
+  defaults (this revision).
 
 ### 4.4 Stability under re-conversion
 
@@ -822,7 +822,7 @@ pub fn wakir_persona_hash(doc: &WakirPersonaV1) -> String {
 ### 5.2 Pin-pack inheritance
 
 The 13 active personae produce 13 framework-native documents.
-Sprint-Pengine-7 Tag-1 records the **V-907 canonical-subset
+This revision records the **V-907 canonical-subset
 pin** for each of the 13 (the `canonical_subset` block of each
 wakir-persona-v1 document, hashed via the unchanged V-907
 function). These 13 pins extend the V-907 pin-pack at the
@@ -848,7 +848,7 @@ pin-pack. wat-eng-slot cross-review surfaces:
 
 ### 6.1 Inventory
 
-Sprint-Pengine-7 Tag-1 ships test vectors for the 13 active
+This revision ships test vectors for the 13 active
 personae under
 `wirelang-rust/crates/persona-engine-format/tests/fixtures/claude-agents/`:
 
@@ -870,7 +870,7 @@ personae under
 
 ### 6.2 Validation surface
 
-For each persona, Tag-1 tests assert:
+For each persona, This revision tests assert:
 
 1. **T-PEF-{slug}-A** — `.claude/agents/<slug>.md` parses as valid `persona-claude-native`.
 2. **T-PEF-{slug}-B** — `map_claude_native_to_wakir_v1(input)` produces a JSON document that validates against `wakir-persona-v1.json`.
@@ -885,38 +885,38 @@ For each persona, Tag-1 tests assert:
 - **T-PEF-EDGE-02** — Missing `description` (synthetic fixture) is rejected by `persona-claude-native` schema with code `missing-top-level-key`.
 - **T-PEF-EDGE-03** — Unknown front-matter keys (synthetic fixture) are preserved in `claude_native_source` and dropped from `canonical_subset`.
 
-Total Tag-1 test floor: 13 × 4 + 5 = 57 (test-floor; the
+Total this revision test floor: 13 × 4 + 5 = 57 (test-floor; the
 implementation may add auxiliary probes).
 
-## 7. Cross-review zones (Sprint-Pengine-7 Tag-1..Tag-3)
+## 7. Cross-review zones
 
-| Zone | Partner | Trigger | Tag-1/2 touch | v1.2 Tag-3 touch | Ack required? |
+| Zone | Partner | Trigger | touch | v1.2 this revision touch | Ack required? |
 |---|---|---|---|---|---|
-| **J** | container-ops-slot | container-bridge spec change | yes — §3.5 specifies image template, labels, env vars | yes — §3.7.1 P4 phase fixes Quadlet `TimeoutStopSec=30s` + `SIGKILL_FALLBACK` semantics for clean despawn | yes, before Sprint-Pengine-7 Tag-4 (container backend implementation) |
+| **J** | container-ops-slot | container-bridge spec change | yes — §3.5 specifies image template, labels, env vars | yes — §3.7.1 P4 phase fixes Quadlet `TimeoutStopSec=30s` + `SIGKILL_FALLBACK` semantics for clean despawn | yes, before (container backend implementation) |
 | **K** | wat-eng-slot | WAT-frame format / V-907 hash function change | **no functional change** — §5 confirms hash function unchanged, only operator-side pin-pack added | spec-only — §3.7.1 P3 phase emits a WAT-frame referencing the final `CompositionVerdict`; §3.7.2 invariant 1 anchors recovery-drill acceptance on V-907 hash byte-equality | yes, confirmation that no WAT-frame change is needed; §3.7.1 P3 frame is the existing engine-side audit frame, not a new schema |
-| **L** | identity-eng-slot | identity_doc_ref forward-link | reserved in §4.3 (synthesised default with safe fallback); §3.x carries no identity-document URI yet | spec-only — §3.7.1 P2 phase consumes the identity-doc binding for capability-token-revocation surface; §3.7.2 DRILL_SPIRE_SVID_EXPIRED exercises the identity layer | not until Sprint-Pengine-7 Tag-3+; v1.2 records the touch as spec-level only (Reza Sprint-9 Tag-2 durable-ledger anchor pairs with §3.7.2.3 drill anchoring) |
-| **B** | container-ops-slot (NATS-KV) | NATS-KV bucket-family touch | **TOUCH** in §3.4 (bucket-name family reserved) | **TOUCH** in §3.7.1 P1 phase (drain protocol on `wakir-persona-state-{persona_id}`) and §3.7.2 DRILL_NATS_BUCKET_LOST | yes, before Sprint-Pengine-7 Tag-4 (state-persistence backend module) |
+| **L** | identity-eng-slot | identity_doc_ref forward-link | reserved in §4.3 (synthesised default with safe fallback); §3.x carries no identity-document URI yet | spec-only — §3.7.1 P2 phase consumes the identity-doc binding for capability-token-revocation surface; §3.7.2 DRILL_SPIRE_SVID_EXPIRED exercises the identity layer | not until this revision; v1.2 records the touch as spec-level only (the durable-ledger anchor pairs with §3.7.2.3 drill anchoring) |
+| **B** | container-ops-slot (NATS-KV) | NATS-KV bucket-family touch | **TOUCH** in §3.4 (bucket-name family reserved) | **TOUCH** in §3.7.1 P1 phase (drain protocol on `wakir-persona-state-{persona_id}`) and §3.7.2 DRILL_NATS_BUCKET_LOST | yes, before (state-persistence backend module) |
 | **HR** | hr-slot | persona-definition governance | v1.0: §4.3 synthesis defaults HR-slot-ratification-pending; v1.1: bedingt-ack 2026-05-13 (Counter-Vorschlag 1 eingearbeitet als §4.3.1 `synthesis_default_exceptions`; Counter-Vorschläge 2-3 als OI-PEF-7/8 registriert) | spec-only — §3.7.3.1 condition (3) makes HR-slot ratification a hard gate on migrate-version transitions | v1.2: no new governance gate opened (additive-only); v1.1 bedingt-ack carries |
 
-## 8. Open items (Sprint-Pengine-7 Tag-1..Tag-3 follow-up)
+## 8. Open items (follow-up)
 
-Tag-3 (v1.2) CONSUMES: OI-PEF-5 (Zone L touch documented at §3.7.1 P2
-and §3.7.2 DRILL_SPIRE_SVID_EXPIRED; impl-axis remains Reza-Sprint-9
-Tag-2+ slot). Tag-3 (v1.2) ADDS: OI-PEF-9..OI-PEF-12 below.
+v1.2 CONSUMES: OI-PEF-5 (Zone L touch documented at §3.7.1 P2
+and §3.7.2 DRILL_SPIRE_SVID_EXPIRED; impl-axis remains Wirelang-track-this revision
+This revision slot). v1.2 ADDS: OI-PEF-9..OI-PEF-12 below.
 
 - **OI-PEF-1** — Markdown-body section extractor for `## Hierarchie` /
   `## Befugnis-Rahmen` so the synthesised `identity_pinned` block
-  reflects per-persona facts (Tag-2).
+  reflects per-persona facts.
 - **OI-PEF-2** — Container-bridge Quadlet template implementation
-  (Tag-4, Zone J).
+  (Zone J).
 - **OI-PEF-3** — NATS-KV state-persistence backend module
-  `wirelang.persona.state_kv` mirroring the Sprint-8 Tag-4
-  marker-stack-kv pattern (Tag-4).
+  `wirelang.persona.state_kv` mirroring this revision
+  marker-stack-kv pattern.
 - **OI-PEF-4** — Persona-spec-converter CLI binary
   `wakir-persona convert-claude-native --in PATH --out PATH`
-  (Tag-2, Sprint-Pengine-7).
+.
 - **OI-PEF-5** — Identity-document forward-link URI scheme
-  (Zone L, Tag-3+).
+  (Zone L).
 - **OI-PEF-6** — `persona-claude-native` schema extension for
   the model-override field (currently inferred at conversion
   time; could be made an explicit schema field).
@@ -924,40 +924,40 @@ Tag-2+ slot). Tag-3 (v1.2) ADDS: OI-PEF-9..OI-PEF-12 below.
   (`budget_cap_eur_per_month` + `budget_cap_eur_per_transaction`)
   to reflect both ADR-0001 Delegationsmatrix dimensions. v1.1
   records only the per-month dimension; per-transaction (≤ 20 EUR
-  for CEO-Freigrenze) is unrepresented. Aisha-HR-Counter-Vorschlag 2,
-  Sprint-Pengine-7 Tag-N+.
+  for CEO-Freigrenze) is unrepresented. HR counter-proposal 2,
+This revision.
 - **OI-PEF-8** — `identity_pinned_policy_version` field on the
   `migration_metadata` block (§3.6) to record which default-policy
   version was in effect at conversion time. Enables an HR-audit-sweep
   to recognise which persona-documents were synthesised under
-  older defaults. Aisha-HR-Counter-Vorschlag 3, Sprint-Pengine-7
-  Tag-N+.
+  older defaults. HR counter-proposal 3, this revision
+This revision.
 - **OI-PEF-9** — Quadlet `OnCalendar=` timer schedule for the
   three recovery-drill classes (§3.7.2.3 operator-scheduled).
   Quadlet template lands on container-ops-slot-side; engine
-  consumes the drill-trigger envelope only. Sprint-Pengine-7
-  Tag-4+ (Zone J impl axis).
+  consumes the drill-trigger envelope only. this revision
+This revision (Zone J impl axis).
 - **OI-PEF-10** — Operator-CLI surface `wakir-persona
   drill --persona <id> --class {CONTAINER_CRASH,NATS_BUCKET_LOST,
   SPIRE_SVID_EXPIRED}` for manual drill execution outside the
   scheduled cadence. Mirrors the §3.7.2 acceptance criteria as
-  exit-code-encoded outcome. Sprint-Pengine-7 Tag-N+.
+  exit-code-encoded outcome. This revision.
 - **OI-PEF-11** — Persistent `recovery_drill_outcome` envelope
   schema-registry entry (`wakir.persona.recovery-drill-outcome/1`)
-  so Reza Sprint-9 Tag-2 durable-ledger can anchor drill
+  so the durable-ledger can anchor drill
   outcomes into the WAT merkle tree (Zone K cross-review).
-  Sprint-Pengine-7 Tag-N+ (Reza-side Sprint-9 Tag-2+ paired axis).
+This revision (Wirelang-side this revision paired axis).
 - **OI-PEF-12** — `MigrateVersionGovernanceGateError` runtime
   surface in the persona-engine crate, surfaced as a structured
   error when §3.7.3.1 condition (3) is missing. The error MUST
   carry `(persona_id, source_version, target_version,
-  missing_hr_audit_annotation_path)` for forensics. Sprint-Pengine-7
-  Tag-N+ (paired with Aisha-HR-slot governance-revision flow).
+  missing_hr_audit_annotation_path)` for forensics. this revision
+This revision (paired with HR-slot governance-revision flow).
 
 ## 9. Compatibility statement
 
-Sprint-Pengine-7 Tag-1 is **purely additive** relative to
-Phase-1b Sprint-6:
+This revision is **purely additive** relative to
+This revision:
 
 - All seven existing Rust crates (`persona-hash`,
   `persona-canonical-form`, `persona-canonical-form-yaml`,
@@ -970,9 +970,9 @@ Phase-1b Sprint-6:
 - The persona-v1 / persona-v2 JSON-Schemas are byte-unchanged.
 - The schema-registry-spec v0.31.0 bucket inventory is touched
   only by **reservation** of the `wakir-persona-state-{persona_id}`
-  family (Sprint-Pengine-7 Tag-4 will implement; Tag-1 documents).
+  family (This revision will implement; This revision documents).
 
-New artefacts (Sprint-Pengine-7 Tag-1):
+New artefacts:
 
 - `wirelang/specs/persona-engine-format-spec.md` (this file).
 - `wirelang/schemas/persona-claude-native.json` (input-axis JSON-Schema).
@@ -980,7 +980,7 @@ New artefacts (Sprint-Pengine-7 Tag-1):
 - `wirelang-rust/crates/persona-engine-format/` (mapping crate).
 - `wirelang-rust/crates/persona-engine-format/tests/fixtures/claude-agents/` (13 test vectors).
 
-Sprint-Pengine-7 Tag-3 (v1.2) is **purely additive** relative to
+v1.2 is **purely additive** relative to
 v1.1:
 
 - §3.7 lifecycle protocols are spec-level surfaces over the
@@ -993,7 +993,7 @@ v1.1:
   persona-converter crate) remain green; the V-907 persona-hash
   function and all 13 active personae's hash pins remain
   byte-unchanged.
-- The `persona-engine-format` crate gains a Tag-3 lifecycle-protocols
+- The `persona-engine-format` crate gains a lifecycle-protocols
   surface module (`lifecycle_protocols`) carrying pure-data
   constants and validator functions matching §3.7. The mapping
   entry-point `map_claude_native_to_wakir_v1` is byte-unchanged.
@@ -1004,4 +1004,4 @@ This specification is licensed under the Creative Commons
 Attribution 4.0 International License
 (<https://creativecommons.org/licenses/by/4.0/>).
 
-— pengine-eng, Sprint-Pengine-7 Tag-3
+— pengine-eng, this revision

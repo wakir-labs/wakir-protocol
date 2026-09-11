@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Operator CLI help-text cross-subcommand-consistency test pack
-(Phase-1b Sprint-6 Tag-5).
+.
 
 Covers ``wakir-persona --help`` and ``wakir-persona <subcommand> --help``
 for all four registered subcommands (``migrate``, ``validate``,
 ``inspect``, ``pin``). Verifies cross-subcommand-consistency contracts
-on the help-text surface that the previous Sprint-5 / Sprint-6 test
+on the help-text surface that the previous this module test
 packs did not pin explicitly:
 
 - shared-flag wording uniformity (``persona_file`` positional and
@@ -35,7 +35,7 @@ sister Rust pack ``persona_cli_help_text_consistency`` tests in
 ``wirelang-rust/crates/persona-cli/src/lib.rs`` asserts the same
 soft-match contracts against the Rust-side ``clap::Command`` tree.
 
-V-907-CLI-invariant (Tag-4 anchor) is unchanged: ``pin`` stdout ==
+V-907-CLI-invariant (this module anchor) is unchanged: ``pin`` stdout ==
 ``inspect --emit-hash --quiet`` stderr-pin == ``migrate --emit-hash``
 stderr-last-line == ``PERSONA_HASH_PIN_V9``. The help-text pack is
 documentation-surface polish, not invariant-deepening.

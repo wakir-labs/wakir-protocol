@@ -9,10 +9,10 @@ License: This document is licensed under the Creative Commons Attribution
 
 # Wirelang Test-Vector Strategy (TV-W)
 
-Status: draft, Phase 1b, Tag-13 spec-only.
+Status: draft, Phase 1b, this revision spec-only.
 Counterpart of: `wakir-runtime/docs/wat-tv1-test-plan.md`,
 `wat-tv2-test-plan.md`, `wat-tv3-test-plan.md` (WAT side).
-Author: Reza, 2026-05-07.
+Author: the Wirelang track, 2026-05-07.
 
 This document specifies the Wirelang-side test-vector strategy in
 symmetry to the WAT TV-1 / TV-2 / TV-3 live-run series. Where WAT-TV
@@ -278,7 +278,7 @@ wirelang/
 Fixture files are deterministic JSON (RFC 8785 canonicalised) so the
 golden hashes are stable across platforms. Replay bundles use the
 existing DNS-anchor and HTTPS-backend replay protocols introduced in
-Phase-1b Tag-5..Tag-8.
+This revision.
 
 ## 5. CI integration
 
@@ -292,14 +292,14 @@ All three TV-W vectors are correctness-gates in both CI lanes
 (hermetic). Live mode is operator-on-demand, mirroring the WAT
 public-OTS pattern.
 
-Drift-detection (Tag-12 Companion) covers TV-W tests in the existing
+Drift-detection (this revision Companion) covers TV-W tests in the existing
 `production_count - sandbox_count = 144 ±5` envelope; if TV-W test
 modules are added, the `EXPECTED_DELTA` constant requires explicit
 re-baseline via workflow-PR.
 
 ## 6. Implementation sequencing
 
-Implementation is *not* in scope for Tag-13 (spec-only per Mira-
+Implementation is *not* in scope for (spec-only per operator-
 Auftrag). The recommended sequencing for follow-up days:
 
 1. **TV-W-1 first** — smallest scope, no external substrate, fastest
@@ -310,7 +310,7 @@ Auftrag). The recommended sequencing for follow-up days:
    chain-shape inputs; introduces external-substrate replay
    bundles.
 
-Each implementation day is one Mira-box; per-day deliverable is the
+Each implementation day is one implementation day; per-day deliverable is the
 golden-fixture file plus the test module plus a minimal addition to
 this spec when the fixture pins crystallise.
 
@@ -323,7 +323,7 @@ this spec when the fixture pins crystallise.
   TV-W is CPU-bound and adding budgets here is theatre.
 - **Coverage metrics:** TV-W is hash-pinned-output verification, not
   coverage-driven. A separate coverage layer is a different topic
-  (Tag-12 Option B).
+  (this revision Option B).
 - **Mutation testing:** TV-W-2 includes a single negative-control
   mutation (caveat-removal). Full mutation-testing on the Datalog
   evaluator is out of scope.
@@ -343,7 +343,7 @@ Pin values are added here as each TV-W vector is implemented. A
 re-baseline of any pin is an explicit engineering event and requires
 an updated entry below plus a workflow-PR note.
 
-### A.1 TV-W-1 (Phase-1b Tag-14, 2026-05-07)
+### A.1 TV-W-1 (2026-05-07)
 
 - Golden fixture: `wirelang/tests/fixtures/tv-w-1/pin-pack.json`.
 - Builder / regenerator: `wirelang.tests._tv_w_1_pin_pack_builder`
@@ -359,7 +359,7 @@ an updated entry below plus a workflow-PR note.
   excluded from the pin-pack. The unsigned DID-body JCS-SHA-256 is
   the byte-stable substitute.
 
-### A.2 TV-W-2 (Phase-1b Tag-16, 2026-05-07)
+### A.2 TV-W-2 (2026-05-07)
 
 - Golden fixture: `wirelang/tests/fixtures/tv-w-2/pin-pack.json`.
 - Builder / regenerator: `wirelang.tests._tv_w_2_pin_pack_builder`
@@ -391,12 +391,12 @@ an updated entry below plus a workflow-PR note.
   byte-stable signatures. Chain `next_pubkey` slots are derived
   deterministically from the TV-W-1 seed via labelled SHA-256
   expansion (see `_derive_chain_seed` in the builder).
-- Drift envelope (Tag-12 §5): TV-W-2 module additions (+29 production
-  / +28 sandbox = +1 net delta over Tag-15 baseline 149) leave the
+- Drift envelope (§5): TV-W-2 module additions (+29 production
+  / +28 sandbox = +1 net delta over baseline 149) leave the
   envelope at 150 (drift 1, tolerance 5) — no `EXPECTED_DELTA`
   re-baseline required.
 
-### A.3 TV-W-3 (Phase-1b Tag-17, 2026-05-07)
+### A.3 TV-W-3 (2026-05-07)
 
 - Golden fixture: `wirelang/tests/fixtures/tv-w-3/pin-pack.json`.
 - Replay bundle: `wirelang/tests/fixtures/tv-w-3/replay/` (DNS TXT
@@ -417,7 +417,7 @@ an updated entry below plus a workflow-PR note.
     document_signature).
   - `biscuit_root_pubkey_hex` / `matched_issuer_kid` (federation
     cross-check outcome).
-  - `frame_verify_status` / `frame_verify_kind` (Tag-9
+  - `frame_verify_status` / `frame_verify_kind` (this revision
     consumer-side bridge gate).
 - AIP-issuer key: TV-W-1 persona-(1, 0) Ed25519 sub-key. The biscuit-
   root pubkey
@@ -447,9 +447,9 @@ an updated entry below plus a workflow-PR note.
   AIP issuer signs AIP body) produce byte-stable bytes. JCS resolver
   indirection (rfc8785 vs pure-Python) is byte-equivalent for the
   document shapes used here.
-- Drift envelope (Tag-12 §5): TV-W-3 module additions (+24 production
-  collected / +24 sandbox collected = ±0 net delta over Tag-16
+- Drift envelope (§5): TV-W-3 module additions (+24 production
+  collected / +24 sandbox collected = ±0 net delta over this revision
   baseline) leave the envelope unchanged — no `EXPECTED_DELTA`
   re-baseline required.
 
-— Reza
+— the Wirelang track

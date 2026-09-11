@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Cross-bucket schema replication for the Wirelang schema registry.
 
-Phase-1b Sprint-3 Tag-6 (S3-6) lands the production-target
+This module (S3-6) lands the production-target
 replication layer for the Wirelang schema registry described in
 ``wirelang/specs/schema-registry-spec.md``. The replication layer
 mirrors the contents of one ``wakir-schemas`` bucket onto another:
@@ -19,15 +19,15 @@ Composition contract
 --------------------
 
 The replicator is a *thin composition* of three Phase-1c surfaces
-that already shipped in Tag-3 / Tag-4 / Tag-5:
+that already shipped in / this module:
 
-- **Source side (Tag-4 watch-stream):** the replicator opens a
+- **Source side (this module watch-stream):** the replicator opens a
   :func:`open_watch_stream` over the source backend and consumes
   decoded :class:`WatchEvent` instances one at a time. Bootstrap is
   taken from :meth:`NatsKvSchemaRegistry.snapshot` so the target
   starts from a complete, self-consistent view; the watch-stream then
   fills in the live tail.
-- **Target side (Tag-3 CAS-pin + Tag-1 LWW):** the replicator writes
+- **Target side (this module CAS-pin + this module LWW):** the replicator writes
   each event to the target backend through one of two paths,
   selectable via :class:`ReplicationConflictPolicy`:
 
@@ -48,9 +48,9 @@ that already shipped in Tag-3 / Tag-4 / Tag-5:
     behaviour when the target is also a writeable surface and the
     operator wants to detect divergence.
 
-- **Operator-input side (Tag-5 publisher CLI):** when an operator
+- **Operator-input side (this module publisher CLI):** when an operator
   needs to forcibly re-apply a divergent target entry from the
-  source, they invoke the Tag-5 publisher CLI against the target
+  source, they invoke the publisher CLI against the target
   bucket with the source-side schema body. The replicator does NOT
   itself bake an operator-override into its event-loop; that is a
   separate operator concern.
@@ -75,11 +75,11 @@ Phase-1c boundary
 
 The replicator does NOT implement:
 
-- **Bidirectional replication.** Tag-6 is one-way (source → target).
+- **Bidirectional replication.** This module is one-way (source → target).
   Bidirectional replication requires conflict-free CRDT-style merges
   that are out of scope for Phase-1c (Phase-2 reservation:
   ``OI-7-Phase-2-bidir-replication``).
-- **Multi-source fan-in.** Tag-6 has exactly one source backend and
+- **Multi-source fan-in.** This module has exactly one source backend and
   one target backend per :class:`SchemaReplicator` instance;
   operators that want fan-in run multiple replicators against one
   target.
@@ -116,9 +116,9 @@ backends:
   on first conflict pass ``halt_on_conflict=True``.
 
 Pattern source: the V-908 federation routes backend ships the
-Tag-6 watch-stream pattern; this module is the schema-registry
+This module watch-stream pattern; this module is the schema-registry
 analogue. There is no V-908 *replication* pattern (the V-908 routes
-backend has not yet shipped a replication layer); Tag-6 is therefore
+backend has not yet shipped a replication layer); This module is therefore
 the canonical Wakir-internal replication template.
 """
 
@@ -156,10 +156,10 @@ __all__ = [
 class ReplicationConflictPolicy(enum.Enum):
     """How the replicator writes to the target bucket.
 
-    - ``SOURCE_WINS``: target writes are LWW (Tag-1 path); whatever
+    - ``SOURCE_WINS``: target writes are LWW (this module path); whatever
       the source emits lands on the target unconditionally.
     - ``CAS_PIN``: target writes are CAS-pinned against the target's
-      observed revision (Tag-3 path); a target-side concurrent write
+      observed revision (this module path); a target-side concurrent write
       surfaces as :class:`SchemaRegistryConflictError` and the
       replicator surfaces the conflict to the metrics counter.
     """
@@ -198,7 +198,7 @@ class ReplicationMetrics:
     The replicator updates these counters synchronously inside its
     event loop. Tests assert against the final shape; production
     operators expose them via a metrics-pull endpoint (out of scope
-    for Tag-6).
+    for this module).
 
     Fields
     ------
@@ -340,7 +340,7 @@ async def bootstrap_target_from_source(
 class SchemaReplicator:
     """One-way schema-registry replicator (source → target).
 
-    Composes Tag-4 source-side watch-stream + Tag-3 / Tag-1 target-side
+    Composes this module source-side watch-stream + this module target-side
     write paths. Bootstrap is via :func:`bootstrap_target_from_source`
     (called by :meth:`run` once before the watch-stream loop).
 

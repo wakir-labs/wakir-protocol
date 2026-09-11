@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://wakir.dev/wirelang/schema/wakir-inclusion-proof-v1/0.1.0",
+  "title": "WAT Merkle inclusion proof — wakir-inclusion-proof/v1 (STUB)",
+  "x-spdx-license-identifier": "Apache-2.0",
+  "x-spdx-file-copyright-text": "2026 Callandor GmbH and contributors",
+  "x-status": "stub",
+  "description": "STUB — placeholder for the canonical wakir-inclusion-proof/v1 schema. TODO (ADR-0072 Phase 4, W4 cross-repo compatibility): merge the runtime-side draft authored in W2 (wakir-runtime `wirelang/schemas/wakir-inclusion-proof-v1.json`, emitted by `scripts/demo-proof.sh` step 4) into this file; wakir-protocol is the canonical home, wakir-runtime mirrors it, wakir-verify validates against it. Until the merge this stub only pins the field set that the proof-path test vectors under tests/fixtures/proof-path-vectors/ exercise: a self-contained SHA-256 sibling path from leaf_hash to merkle_root, Bitcoin duplicate-last convention, side L = sha256(sibling || current), side R = sha256(current || sibling). The stub deliberately omits additionalProperties=false and the optional hour/manifest_version/event_id constraints so that the W2 draft can land without a breaking bump.",
+  "type": "object",
+  "required": ["schema", "merkle_root", "leaf_hash", "leaf_index", "leaf_count", "siblings"],
+  "properties": {
+    "schema": {"type": "string", "const": "wakir-inclusion-proof/v1"},
+    "merkle_root": {"$ref": "#/$defs/sha256hex"},
+    "leaf_hash": {"$ref": "#/$defs/sha256hex"},
+    "leaf_index": {"type": "integer", "minimum": 0},
+    "leaf_count": {"type": "integer", "minimum": 1},
+    "siblings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["hash", "side"],
+        "properties": {
+          "hash": {"$ref": "#/$defs/sha256hex"},
+          "side": {"type": "string", "enum": ["L", "R"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256hex": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

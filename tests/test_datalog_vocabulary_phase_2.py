@@ -177,7 +177,7 @@ def datalog_caveat_validator_v02():
         schema = json.load(fh)
     _Draft202012Validator.check_schema(schema)
     # Sanity: this test module assumes v0.2.1 schema (post-ADR-0052
-    # Class-P-Promotion of `caveat_hash`; Sprint-6 Tag-8 ratification).
+    # Class-P-Promotion of `caveat_hash`; This module ratification).
     # Pre-ADR-0052 the assertion pinned ``/0.2.0``; the promotion bump
     # is additive and is exercised by the dedicated T-V0.2.1-* probes
     # below.

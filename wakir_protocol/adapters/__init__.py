@@ -11,10 +11,10 @@ adapter-surface contract is the wirelang-side stable interface.
 
 Current adapters:
 
-- :mod:`wakir_protocol.adapters.spiffe_workload_api` (Sprint-6 Tag-4 skeleton +
-  Sprint-6 Tag-5 mock impl) — SPIFFE Workload API surface stub,
+- :mod:`wakir_protocol.adapters.spiffe_workload_api` (this module skeleton +
+This module mock impl) — SPIFFE Workload API surface stub,
   indirection over the upstream ``spiffe`` PyPI package. Surface +
   hermetic in-process :class:`MockSpiffeWorkloadApiAdapter` for tests;
   real upstream-``spiffe``-backed functional implementation deferred to
-  Sprint-6 Tag-6+ / Phase-2c.
+This module / Phase-2c.
 """

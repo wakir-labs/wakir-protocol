@@ -26,7 +26,7 @@ inter-agent messaging stack as it stands at the close of Phase-1a.
 > **v0.2.1 (2026-05-16):** Additive minor bump. Adds §13
 > "Layer-0 Subscribe-Mode contract" — publisher-subscriber mode
 > compatibility, cross-mode adapter requirements, failure-mode
-> inventory. Triggered by Sprint-Pengine-13 Bug-42 (subscribe-loop
+> inventory. Triggered by Bug-42 (subscribe-loop
 > received no messages because dispatcher published via core NATS
 > while a JetStream-durable-pull-consumer was expected). Existing
 > §3 Layer-0 text unchanged; §13 is a normative refinement that
@@ -34,7 +34,7 @@ inter-agent messaging stack as it stands at the close of Phase-1a.
 > NATS surface they use. No frame-format or token-format change.
 
 It supersedes the per-layer drafts shipped during Phase-1a daily
-build (Tag-1 through Tag-9) and references — but does not duplicate —
+build (this revision through this revision) and references — but does not duplicate —
 the JSON-Schema documents and supporting specifications that ship in
 the same module.
 
@@ -230,9 +230,8 @@ of Wirelang spec version: vocabulary v0.1 is bound to Wirelang
 v0.1 *and* v0.2.
 
 Phase-2 vocabulary growth is ratified in
-`specs/datalog-caveat-vocabulary-phase-2.md` (Phase-1b Tag-15,
-2026-05-07). The ratified document supersedes the earlier sketch
-(`specs/datalog-caveat-vocabulary-phase-2-skizze.md`); it
+`specs/datalog-caveat-vocabulary-phase-2.md` (ratified
+2026-05-12). It
 classifies all predicates into N1 / N2 / R / P, ratifies the
 Caveat-Set Canonicalisation Rule (§4-CSC), promotes `peer_org`
 and `federation_route` to schema-admitted N2-federation
@@ -308,12 +307,12 @@ v0.2 demonstrates the additive-minor pattern. Specifically:
 
 - v0.2 introduces no new mandatory frame attributes.
 - v0.2 introduces no new caveat predicates (the eighteen+two
-  predicates of vocabulary v0.1 land in v0.2 from Phase-1a Tag-3
+  predicates of vocabulary v0.1 land in v0.2 from this revision
   rather than from v0.1.0; the JSON Schema accepted them in v0.1.0
   already).
 - v0.2 documents the identity substrate and the WAT leaf projection
   as integral parts of the spec rather than as out-of-scope
-  Tag-N memos.
+This revision memos.
 
 ### 8.2 Migration v0.1.0 → v0.2.0
 
@@ -388,17 +387,16 @@ guide.md` §9 at v0.2 publication.
 
 ## 11. References
 
-### 11.1 Wakir specs (this module)
+### 11.1 Wakir specs (this repository)
 
 - `specs/layer-0-2-overview.md` — Layer-0–2 walkthrough.
 - `specs/layer-3-capability-token.md` — Layer-3 trust concerns.
 - `specs/datalog-caveat-vocabulary.md` — vocabulary v0.1 (18+2
   predicates).
 - `specs/datalog-caveat-vocabulary-phase-2.md` — Phase-2 ratified
-  vocabulary (v0.2, Tag-15): N1/N2/R/P classification,
+  vocabulary (v0.2): N1/N2/R/P classification,
   Caveat-Set Canonicalisation Rule, V-908 federation extension,
-  TV-W-2 pin-stability guarantee. **Supersedes** the sketch
-  document `datalog-caveat-vocabulary-phase-2-skizze.md`.
+  TV-W-2 pin-stability guarantee.
 - `specs/identity-substrate.md` — persona substrate.
 - `specs/wat-leaf-projection.md` — Wirelang→WAT bridge contract.
 - `specs/recovery-drill-leaf-projection.md` — recovery-drill
@@ -432,8 +430,8 @@ guide.md` §9 at v0.2 publication.
 
 ## 12. Acknowledgements
 
-This consolidation is the product of Phase-1a daily build (Tag-1
-through Tag-9) and the cross-review sessions moderated by HR
+This consolidation is the product of Phase-1a daily build (this revision
+through this revision) and the cross-review sessions moderated by HR
 (consensus markers A1, B2, C1, D2 for Zone 1; commit `338e007`
 for Zone 2). Implementation lives in `wirelang/identity/` and
 `wirelang/schemas/`. Test coverage at v0.2 publication: 274/274
@@ -464,7 +462,7 @@ A subscriber that binds via `nc.subscribe` receives core publishes
 to the core-subscriber leg; it does **not** receive JetStream
 messages that the consumer is meant to pull-acknowledge.
 
-This asymmetry is the root cause of the Sprint-Pengine-13 Bug-42
+This asymmetry is the root cause of the Bug-42
 class: the Bridge-Forward-Pipe dispatcher published with
 `nc.publish` (core) while a downstream subscriber bound via a
 JetStream-durable-pull-consumer expecting persistence semantics
@@ -559,7 +557,7 @@ cross-mode adapter MUST be inserted. Allowed adapter shapes:
   transition and a single subscriber must absorb both surfaces.
   Required dedup: by CloudEvents `id` (§4 wire format).
 
-Adapter A is the default for the Sprint-Pengine-13 Bug-42 class
+Adapter A is the default for the Bug-42 class
 (Bridge-Forward-Pipe with core-publisher CLI + JetStream-pull-
 subscribe-loop on persona-engine). Adapter B is the strategic
 target for Phase-2c-Closeout (eliminates the adapter entirely).
@@ -600,7 +598,7 @@ confirm the surface compatibility in §13.2 by:
    runbook entry, or commit-pinned config).
 2. Capturing the subscriber's subscribe-surface declaration (config
    file, env-var, or commit-pinned config).
-3. Running one round-trip dry-run (Mira-Hand or CI live-VM smoke)
+3. Running one round-trip dry-run (operator-hand or CI live-VM smoke)
    with a sentinel payload and verifying subscriber receipt.
 
 This gate is the Layer-0-substrate-version of the live-bring-up

@@ -2,7 +2,7 @@
 """Persona-definition canonical-form extraction (V-907 mock format).
 
 The persona-hash is computed over the **canonical subset** of a
-persona definition, not over the raw markdown body. Phase-1b Sprint-1
+persona definition, not over the raw markdown body. this module
 mock format (HR-slot decision pending):
 
 - Persona definitions ship as markdown files with a YAML front-matter
@@ -59,8 +59,8 @@ SUPPORTED_SCHEMA_VERSION: Final[str] = "persona-v1"
 
 #: All schema-versions the canonical-subset extractor accepts.
 #:
-#: Phase-1b Sprint-1 Tag-2 introduced ``persona-v1``. Phase-1b Sprint-3
-#: Tag-3 appends ``persona-v2`` (the converter's next-major target via
+#: An earlier increment introduced ``persona-v1``.
+#: This module appends ``persona-v2`` (the converter's next-major target via
 #: :class:`wakir_protocol.persona._internal.migration_steps.V1ToV2Step`) so
 #: that a migrated v2-shape dict can route through
 #: :func:`extract_canonical_subset` for post-migration pin verification
@@ -68,9 +68,9 @@ SUPPORTED_SCHEMA_VERSION: Final[str] = "persona-v1"
 #: is identical for v1 and v2 (Default-Lock A-2 additiv-only-no-
 #: narrowing); only the ``schema_version`` const value changes.
 #: Additive optional fields from the persona-v2 schema are **not**
-#: included in the canonical subset on Tag-3 — they default to absent
+#: included in the canonical subset on — they default to absent
 #: in both the lifted v9 input and the projected canonical-subset,
-#: which preserves the Tag-1-Sketch §3 pin-symmetry argument.
+#: which preserves the design sketch §3 pin-symmetry argument.
 ACCEPTED_SCHEMA_VERSIONS: Final[tuple[str, ...]] = (
     "persona-v1",
     "persona-v2",
@@ -258,7 +258,7 @@ def canonical_jcs_bytes(canonical_subset: dict[str, Any]) -> bytes:
     This is the bytes-level boundary that feeds into the SHA-256 step
     in :func:`wakir_protocol.persona.persona_hash.compute_persona_hash_from_canonical`.
     Exposing it directly is the parity-anchor for the Phase-1c Rust
-    crate ``persona-canonical-form`` (Sprint-2 Tag-4 outbox §A2):
+    crate ``persona-canonical-form`` (this module outbox §A2):
     Python and Rust must produce **byte-identical** JCS-bytes for the
     same canonical-subset, otherwise the V-907 pin-pack drifts across
     language boundaries.

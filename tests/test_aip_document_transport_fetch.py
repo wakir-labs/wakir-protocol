@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for ``wakir_protocol.identity_substrate.aip_document_transport_fetch``.
 
-Phase-2 Sprint-4 Tag-4. Tests cover the URL mapping (aip:web → HTTPS),
+This module. Tests cover the URL mapping (aip:web → HTTPS),
 the V-908 HTTPS-transport composition, the optional DNS-anchor
 cross-check (soft + hard modes), and end-to-end composition with the
-Tag-3 ``kid_resolver``.
+This module ``kid_resolver``.
 
 All tests are hermetic: a fake ``urlopen`` is injected into the
 V-908 :class:`HTTPSDocumentTransport` and a stub
@@ -328,7 +328,7 @@ def test_T_AIP_FT_05_fetch_rejects_non_object_root_body() -> None:
     """A JSON-array root body raises HTTPSPayloadError via the transport.
 
     The V-908 :class:`HTTPSDocumentTransport` already enforces "body
-    must be a JSON object" at the transport layer; Tag-4's defensive
+    must be a JSON object" at the transport layer; the earlier increment's defensive
     guard is therefore dead code in the production wire and we test
     the transport's contract here. This pins both invariants in one
     place.

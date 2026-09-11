@@ -1,18 +1,18 @@
 # SPDX-License-Identifier: Apache-2.0
 """Operator CLI for the persona self-migration converter + validator + inspect.
 
-Phase-1b Sprint-2 Tag-3 implementation (S2-T1-06). Thin wrapper around
+This module implementation (S2-T1-06). Thin wrapper around
 :func:`wirelang.persona.migrate_persona` for ad-hoc operator use,
 CI-pipeline integration, and the wakir-runtime self-migration shell
 scripts ADR-0036 anticipates.
 
-Sprint-6 Tag-2 added the ``validate`` subcommand (Phase-1c follow-up
-#1 from the Tag-1 Crate-7 rapport): thin shim over
+An earlier increment added the ``validate`` subcommand (Phase-1c follow-up
+#1 from the Crate-7 rapport): thin shim over
 :func:`wirelang.persona.validate_persona` that emits the structured
 :class:`PersonaValidationReport` as canonical-subset JSON on stdout
 and maps ``is_valid`` to exit-code 0 / 1.
 
-Sprint-6 Tag-3 added the ``inspect`` subcommand (Phase-1c follow-up
+An earlier increment added the ``inspect`` subcommand (Phase-1c follow-up
 items #1 + #8): read-only sister of ``migrate`` / ``validate``. Runs
 no migration, no validation — only the canonical-subset extractor
 and the V-907 persona-hash. Emits a ``PersonaInspectReport``
@@ -21,8 +21,8 @@ and the V-907 persona-hash. Emits a ``PersonaInspectReport``
 parser/extractor failure to exit 1 (the persona-definition was
 unreadable as a canonical subset).
 
-Sprint-6 Tag-4 added the ``pin`` subcommand (Phase-1c follow-up
-item #1 from the Tag-3 inspect rapport): minimal-footprint
+An earlier increment added the ``pin`` subcommand (Phase-1c follow-up
+item #1 from the inspect rapport): minimal-footprint
 shell-pipeline wrapper that emits **only** the V-907 persona-hash
 on stdout (``sha256:<64hex>\\n``) — no JSON, no canonical-subset
 echo, no metadata. Mirror posture of ``inspect --emit-hash --quiet``
@@ -55,7 +55,7 @@ Synopsis
 
 The ``--target`` choice list is sourced from
 :data:`wirelang.persona.PERSONA_SCHEMA_VERSION_LIST`. Phase-1b
-Sprint-3 Tag-3 extended the list with ``persona-v2``; Tag-4 then
+An earlier increment extended the list with ``persona-v2``; This module then
 contracted the v2-target operator surface explicitly via
 ``tests/test_persona_migration_cli_v2_target.py`` (single-step
 v9->v2, multi-step v8->v0->v1->v2 chain, ``--expect-hash`` against
@@ -122,7 +122,7 @@ from wakir_protocol.persona.persona_validator import validate_persona
 
 
 #: Exit code emitted on :class:`PersonaMigrationError` (chain failure)
-#: and on ``validate`` when ``is_valid=False``. Sprint-6 Tag-2 re-uses
+#: and on ``validate`` when ``is_valid=False``. This module re-uses
 #: the same 1-bit "operation failed" exit code for the validator's
 #: failure branch (mirror of `git diff --exit-code` convention: 1 means
 #: "the question has the negative answer").
@@ -463,7 +463,7 @@ def _build_inspect_report(
       and the V8 / V9 fixtures.
     - ``persona_hash``: the V-907 ``"sha256:<64hex>"`` pin computed
       over the canonical subset. By construction this equals the
-      Sprint-4 ``PERSONA_HASH_PIN_V9`` for the V9 fixture.
+This module ``PERSONA_HASH_PIN_V9`` for the V9 fixture.
     - ``report_schema_version``: ``"persona-inspect-v1"``. Bumped
       lock-step with breaking shape changes.
 
@@ -578,7 +578,7 @@ def _run_pin(args: argparse.Namespace) -> int:
     V-907-CLI-invariant: this stdout equals
     ``inspect --emit-hash --quiet`` stderr-pin equals
     ``migrate --emit-hash`` stderr-last-line on a v9 (no-op-chain)
-    input. The Tag-4 test pack pins all three forms against
+    input. The test pack pins all three forms against
     :data:`PERSONA_HASH_PIN_V9` for the V9 fixture.
     """
     persona_file: Path = args.persona_file

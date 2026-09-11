@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for the Wirelang capability-policy CAS-pin path.
 
-Phase-2 Sprint-5 Tag-4 (S5-4). Tests the additive CAS-pin surface
+This module (S5-4). Tests the additive CAS-pin surface
 on :mod:`wakir_protocol.schemas.capability_policy_nats_kv_backend`:
 
 - :meth:`NatsKvCapabilityPolicyBackend.get_with_revision`
@@ -10,12 +10,12 @@ on :mod:`wakir_protocol.schemas.capability_policy_nats_kv_backend`:
 - :class:`CapabilityPolicyConflictError`
 
 The CAS-pin path is the lost-update protection contract for
-concurrent capability-policy authorship (a Sprint-5 Tag-4 addition).
-The Sprint-5 Tag-2 LWW path (``put`` / ``get`` / ``delete`` /
-``snapshot`` / ``snapshot_registry``) is unaffected; Tag-4 surfaces
+concurrent capability-policy authorship (a addition).
+The LWW path (``put`` / ``get`` / ``delete`` /
+``snapshot`` / ``snapshot_registry``) is unaffected; This module surfaces
 are purely additive.
 
-Pattern-Mirror source: Phase-1b Sprint-3 Tag-3 schema-registry
+Pattern-Mirror source: This module schema-registry
 CAS-pin test inventory (``test_schema_registry_cas_pin.py``). The
 CAS-aware mock KV ``_MockKvCas`` mirrors nats-py's KeyValue.update
 contract: ``update(key, value, last=expected_revision)`` raises
@@ -171,7 +171,7 @@ class _MockKvNoCas:
 
 
 # ---------------------------------------------------------------------------
-# Fixtures (mirror Tag-2 fixture shape)
+# Fixtures (mirror this module fixture shape)
 # ---------------------------------------------------------------------------
 
 
@@ -403,7 +403,7 @@ def test_t_cpp_cas_06_validation_gate_pair_key_runs_before_cas():
     CAS call. The record's ``key`` property invokes
     :func:`key_for_policy_pair` which validates the components; a
     record with a malformed ``policy_id`` cannot be constructed in
-    the first place (Sprint-5 Tag-2 ``__post_init__`` invariant),
+    the first place (this module ``__post_init__`` invariant),
     and an attempt to build one raises
     :class:`CapabilityPolicyValidationError` before any backend
     interaction. The bucket revision does NOT advance from the
@@ -498,8 +498,8 @@ def test_t_cpp_cas_08_interleaved_pair_exactly_one_wins():
 
 def test_t_cpp_cas_09_cas_and_lww_orthogonal():
     """T-CPP-CAS-09: a CAS-pinned put followed by a non-CAS put is
-    observable: the non-CAS put wins (LWW path). Tag-4 CAS-pin and
-    Tag-2 LWW remain orthogonal.
+    observable: the non-CAS put wins (LWW path). This module CAS-pin and
+This module LWW remain orthogonal.
     """
     backend = NatsKvCapabilityPolicyBackend(kv=_MockKvCas())
     r0 = _make_record(policy_id="rollover")
@@ -541,7 +541,7 @@ def test_t_cpp_cas_10_kv_without_cas_surface_raises_backend_error():
     record = _make_record()
 
     async def _go():
-        # Direct put works (LWW path, Tag-2 unchanged).
+        # Direct put works (LWW path, this module unchanged).
         rev = await backend.put(record)
         # CAS-pin attempt must fail explicitly.
         await backend.put_with_revision(record, rev)

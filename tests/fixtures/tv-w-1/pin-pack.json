@@ -1,6 +1,6 @@
 {
   "label": "tv-w-1-identity-pin-pack",
-  "spec": "wirelang/specs/wirelang-tv-strategy.md \u00a71 (Phase-1b Tag-14)",
+  "spec": "wirelang/specs/wirelang-tv-strategy.md \u00a71",
   "seed_hex": "000102030405060708090a0b0c0d0e0f",
   "valid_after": "2026-05-07T00:00:00Z",
   "expires": "2027-05-07T00:00:00Z",
@@ -98,5 +98,5 @@
       "aip_signature_hex": "d4130bb44fa7b2e87bf90558869c2dff248b1597ebee4940531f4fea4b48cf34f7a227f0ba639434f714d785cdef2bf73f467dc5d6a9f8e9ef4fc3b918dd800b"
     }
   ],
-  "pin_pack_sha256": "82149029a34d3595f587000073e62535491f47216ee6cf4aaa224345fe7d88bb"
+  "pin_pack_sha256": "b742a7d9348af71c1ab672f39e2bf07244a0b5e0adda7f13659c11f6e65ead09"
 }

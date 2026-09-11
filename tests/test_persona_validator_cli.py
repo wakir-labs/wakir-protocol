@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Operator CLI test pack for ``wakir-persona validate`` (Phase-1b
-Sprint-6 Tag-2).
+This module).
 
 Covers the ``validate`` subcommand declared in
 :mod:`wakir_protocol.persona.cli`. The subcommand is a thin wrapper around
@@ -288,7 +288,7 @@ def test_validate_v8_idempotent_stdout(
 def test_migrate_subcommand_still_works_after_validate_added(
     capsys: pytest.CaptureFixture[str],
 ):
-    """Sprint-6 Tag-2 must not regress the migrate subcommand."""
+    """This module must not regress the migrate subcommand."""
     rc = main(["migrate", str(V9_FIXTURE), "--quiet"])
     captured = capsys.readouterr()
     assert rc == 0

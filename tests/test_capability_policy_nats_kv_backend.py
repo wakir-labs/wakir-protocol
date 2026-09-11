@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for the Wirelang capability-policy NATS-KV backend.
 
-Phase-2 Sprint-5 Tag-2 (S5-2). Tests the persistent-distribution tier
+This module (S5-2). Tests the persistent-distribution tier
 :mod:`wakir_protocol.schemas.capability_policy_nats_kv_backend` against an
-in-memory mock that mirrors the Sprint-3 Tag-1 schema-registry-backend
+in-memory mock that mirrors the schema-registry-backend
 mock pattern (``tests/test_schema_registry_nats_kv_backend.py``) and
-Kai's Tag-1 mock JetStream surface.
+the DevOps track's this module mock JetStream surface.
 
 Test inventory T-CPP-01..10 + auxiliary probes:
 
@@ -413,7 +413,7 @@ def test_t_cpp_07_wrong_schema_field_rejected():
 def test_t_cpp_08_bucket_config_constants_byte_stable():
     """Drift-protection at the test layer.
 
-    The Sprint-5 Tag-2 Kai-side paired-update memo lists these values
+    The DevOps-side paired-update memo lists these values
     byte-precisely. The orchestrator-side ``BucketSpec`` for the 7th
     bucket will mirror them byte-equal; any deviation surfaces as a
     failure on either side first.

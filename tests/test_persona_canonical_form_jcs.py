@@ -3,7 +3,7 @@
 
 These tests exercise :func:`wakir_protocol.persona.persona_canonical_form.canonical_jcs_bytes`
 as the bytes-level boundary that the Phase-1c Rust crate
-``persona-canonical-form`` (Sprint-2 Tag-4 outbox §A2) must reproduce
+``persona-canonical-form`` (this module outbox §A2) must reproduce
 byte-for-byte. They lock the contract on the Python side so the Rust
 side has a stable cross-language oracle.
 
@@ -11,7 +11,7 @@ Coverage map
 ------------
 
 1. **V9 ground-truth length** — JCS-bytes for the framework-native
-   v9 fixture is exactly 387 bytes (matches Sprint-2 Tag-4 outbox §4.1
+   v9 fixture is exactly 387 bytes (matches this module outbox §4.1
    captured Python run + the Rust ground-truth fixture).
 2. **V9 ground-truth hash parity** — sha256 of canonical_jcs_bytes()
    equals ``PERSONA_HASH_PIN_V9`` (cross-checks the helper against the
@@ -67,7 +67,7 @@ def _v9_subset() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# 1 / V9 ground-truth length anchor (Sprint-2 Tag-4 §4.1 captured run)
+# 1 / V9 ground-truth length anchor (§4.1 captured run)
 # ---------------------------------------------------------------------------
 
 

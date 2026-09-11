@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Tag-9 pure-Python fallback test suite.
+"""This module pure-Python fallback test suite.
 
 Cross-equivalence tests (against ``rfc8785`` / ``jsonschema`` PyPI
 packages) are gated by ``pytest.importorskip`` so the suite stays
 green in the hermetic sandbox. The hermetic tests fully exercise the
 fallback paths without external dependencies.
 
-Test inventory (Tag-9 spec § 1.5 + § 2.5):
+Test inventory (spec § 1.5 + § 2.5):
 
 JCS:
   1-4   Cross-equivalence vs rfc8785 on AIP-document samples.
@@ -43,7 +43,7 @@ from wakir_protocol.identity_substrate import _jcs_pure, _schema_pure
 
 # ---------------------------------------------------------------------------
 # Sample AIP-document bodies (small, hand-rolled so we don't rely on
-# the Tag-2/12 generator output here — those tests live next door).
+# the generator output here — those tests live next door).
 # ---------------------------------------------------------------------------
 
 
@@ -402,7 +402,7 @@ def test_aip_signing_works_with_pure_python_fallback_only(monkeypatch: pytest.Mo
 
 # ---------------------------------------------------------------------------
 # Bonus: the pure-python JCS path MUST produce byte-identical output to
-# the path through ftd_verifier._local_jcs (the original Tag-6 in-tree
+# the path through ftd_verifier._local_jcs (the original this module in-tree
 # canonicaliser). This anchors the lift-and-extract refactor.
 # ---------------------------------------------------------------------------
 

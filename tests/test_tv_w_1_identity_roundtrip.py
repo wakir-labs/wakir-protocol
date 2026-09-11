@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""TV-W-1 hermetic Identity Pin-Pack Roundtrip (Phase-1b Tag-14).
+"""TV-W-1 hermetic Identity Pin-Pack Roundtrip.
 
 Acceptance criteria (per ``wirelang/specs/wirelang-tv-strategy.md`` §1.4):
 
@@ -362,7 +362,7 @@ def _build_pin_pack_with_explicit_canonicalizer(seed: bytes, jcs):
         )
     return {
         "label": "tv-w-1-identity-pin-pack",
-        "spec": "wirelang/specs/wirelang-tv-strategy.md §1 (Phase-1b Tag-14)",
+        "spec": "wirelang/specs/wirelang-tv-strategy.md §1",
         "seed_hex": "000102030405060708090a0b0c0d0e0f",
         "valid_after": "2026-05-07T00:00:00Z",
         "expires": "2027-05-07T00:00:00Z",
@@ -433,13 +433,13 @@ def test_a5_external_regeneration_via_cli(golden: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Cross-compat anchors (Tag-19 / Tag-23 forward-compatibility)
+# Cross-compat anchors (this module forward-compatibility)
 # ---------------------------------------------------------------------------
 
 
 def test_cross_compat_pubkeys_align_with_capability_token_pin() -> None:
     """Forward-compat anchor: persona (0, 0) Ed25519 pub matches the
-    Tag-19 Capability-Token-Pin issuer key (TV-W-2 input per spec §2.2).
+This module Capability-Token-Pin issuer key (TV-W-2 input per spec §2.2).
 
     TV-W-2 uses persona (0, 0) Ed25519 sub-key as the Biscuit issuer.
     Pinning the public key here gives a single audit trail across
@@ -462,7 +462,7 @@ def test_cross_compat_pubkeys_align_with_capability_token_pin() -> None:
 
 def test_cross_compat_persona_1_0_aligns_with_aip_doc_pin() -> None:
     """Forward-compat anchor: persona (1, 0) Ed25519 pub matches the
-    Tag-23 AIP-Doc-Pin signing keypair (TV-W-3 input per spec §3.2).
+This module AIP-Doc-Pin signing keypair (TV-W-3 input per spec §3.2).
 
     TV-W-3 uses persona (1, 0) deliberately to exercise multi-persona
     federation.  Same pinning rationale as the TV-W-2 anchor above.

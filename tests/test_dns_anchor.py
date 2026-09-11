@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for ``wakir_protocol.identity_substrate.dns_anchor`` (V-908 PS-2/PS-3).
 
-Phase-1b Tag-5 production-form tests, ported from the Tag-4 spike
+This module production-form tests, ported from the spike
 (``wirelang/spike/test_dns_anchor_resolver_sketch.py``) with
 production-hardening additions:
 
-* Multi-string-TXT handling -- V-908 §3.4 (Tag-5 minor edit)
+* Multi-string-TXT handling -- V-908 §3.4 (this module minor edit)
   guarantees the resolver concatenates RFC 1035 §3.3.14 segments
   before returning to the parser.
 * StdlibDoHResolver provider failover -- a fake urlopen exercises
@@ -42,7 +42,7 @@ from unittest import mock
 # triggers ``wirelang/identity/__init__.py``, which eagerly imports several
 # sibling modules that depend on the optional ``cryptography`` package. In
 # environments without ``cryptography`` (e.g. the dependency-restricted
-# project sandbox; cf. Tag-4 outbox §4 sandbox-tooling-lücke L1/L3 table),
+# project sandbox; cf. This module outbox §4 sandbox-tooling-lücke L1/L3 table),
 # the package init fails before our zero-dep ``dns_anchor`` submodule is
 # reachable.
 #
@@ -141,7 +141,7 @@ class _FakeHttpResponse:
 
 
 # ---------------------------------------------------------------------------
-# fetch_anchor / parse_anchor hermetic tests (ported from Tag-4 spike)
+# fetch_anchor / parse_anchor hermetic tests (ported from spike)
 # ---------------------------------------------------------------------------
 
 
@@ -401,7 +401,7 @@ class StdlibDoHResolverTests(unittest.TestCase):
 
 
 # ---------------------------------------------------------------------------
-# Multi-string TXT handling -- V-908 §3.4 (Tag-5 minor edit)
+# Multi-string TXT handling -- V-908 §3.4 (this module minor edit)
 # ---------------------------------------------------------------------------
 
 
@@ -545,7 +545,7 @@ class DnsPythonResolverImportPathTests(unittest.TestCase):
 class ModuleSurfaceTests(unittest.TestCase):
     def test_min_ttl_floor_is_normative_constant(self) -> None:
         self.assertIsInstance(MIN_TTL_FLOOR_S, int)
-        # V-908 §3.4 (Tag-5 minor edit): floor MUST be at least 60s
+        # V-908 §3.4 (this module minor edit): floor MUST be at least 60s
         # to mitigate TTL-spoofing. We pin the exact value here so a
         # spec-edit and a code-edit move together.
         self.assertGreaterEqual(MIN_TTL_FLOOR_S, 60)

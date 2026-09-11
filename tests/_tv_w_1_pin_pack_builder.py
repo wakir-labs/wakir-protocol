@@ -87,15 +87,15 @@ def persona_role_string(persona_idx: int, spawn_counter: int) -> str:
 
 
 # ---------------------------------------------------------------------------
-# JCS resolver indirection (Tag-9)
+# JCS resolver indirection
 # ---------------------------------------------------------------------------
 
 
 def _make_jcs_canonicalize() -> Callable[[object], bytes]:
     """Return the active JCS canonicaliser (rfc8785 if available else pure-Python).
 
-    The pin-pack must be reproducible on both lanes (Tag-11 sandbox
-    without rfc8785 + Tag-12 production with rfc8785). The two
+    The pin-pack must be reproducible on both lanes (this module sandbox
+    without rfc8785 + this module production with rfc8785). The two
     backends are byte-equivalent for the document shapes used here;
     that equivalence is itself anchored by
     ``test_pure_python_fallback.py`` and re-verified per pin-pack
@@ -197,7 +197,7 @@ def build_pin_pack(*, seed_hex: str = TV_W_1_TEST_SEED_HEX) -> dict:
     ]
     return {
         "label": "tv-w-1-identity-pin-pack",
-        "spec": "wirelang/specs/wirelang-tv-strategy.md §1 (Phase-1b Tag-14)",
+        "spec": "wirelang/specs/wirelang-tv-strategy.md §1",
         "seed_hex": seed_hex,
         "valid_after": TV_W_1_VALID_AFTER,
         "expires": TV_W_1_EXPIRES,

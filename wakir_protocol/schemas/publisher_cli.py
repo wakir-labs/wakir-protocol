@@ -2,28 +2,28 @@
 # Copyright (c) 2026 Callandor GmbH and contributors
 """Operator publisher CLI for the Wirelang schema registry.
 
-Phase-1b Sprint-3 Tag-5 — OI-7-Phase-1c-publisher.
-Phase-2 Sprint-5 Tag-1 — capability-gating end-to-end integration.
-Phase-2 Sprint-5 Tag-3 — ``--capability-bucket`` persistent-policy source.
-Phase-2 Sprint-6 Tag-2 — ``revoke`` subcommand for explicit
-capability-policy revocation (Sprint-6 Tag-1 backend axis).
+This module — OI-7-Phase-1c-publisher.
+This module — capability-gating end-to-end integration.
+This module — ``--capability-bucket`` persistent-policy source.
+This module — ``revoke`` subcommand for explicit
+capability-policy revocation (this module backend axis).
 
 This module exposes an argparse surface that lets an operator publish
 a module-shipped schema body onto the ``wakir-schemas`` NATS-KV bucket.
-It is the natural composition of the Tag-3 CAS-pin contract
-(``put_with_revision``) and the Tag-1 last-write-wins surface
-(``put``); the watch-stream surface from Tag-4 is the consumer side
+It is the natural composition of the CAS-pin contract
+(``put_with_revision``) and the last-write-wins surface
+(``put``); the watch-stream surface from This module is the consumer side
 (post-publish observability) and is not invoked from the publisher.
 
-Sprint-5 Tag-1 adds three optional flags (``--sign``, ``--gate``,
+This module adds three optional flags (``--sign``, ``--gate``,
 ``--capability-registry``) that lift the canonical Phase-2
-capability-gated publish flow (Sprint-4 Tag-6 §5.12 Composition
+capability-gated publish flow (§5.12 Composition
 Pattern) onto the operator surface without altering the backend
 contract or the receipt's bare-publish shape.
 
-Sprint-5 Tag-3 adds the ``--capability-bucket`` flag, an alternative
+This module adds the ``--capability-bucket`` flag, an alternative
 policy source that loads the capability registry from the persistent
-``wakir-capability-policies`` NATS-KV bucket (Sprint-5 Tag-2
+``wakir-capability-policies`` NATS-KV bucket (this module
 ``capability_policy_nats_kv_backend.NatsKvCapabilityPolicyBackend``)
 via :meth:`snapshot_registry`. Operators choose exactly one of
 ``--capability-registry`` (operator-local JSON file) or
@@ -40,7 +40,7 @@ layer (schema-id, body-hash, identity-triple). The CLI does not
 introduce new validation; it routes operator intent into the
 existing backend gates.
 
-The Sprint-5 Tag-1 capability path is additive: signing and gating
+The capability path is additive: signing and gating
 run between ``_build_entry`` and the backend write, leaving the
 backend's validation gates and the receipt's existing fields
 byte-equal. A deny short-circuits with :class:`ExitCode.CAPABILITY_DENY`
@@ -72,7 +72,7 @@ Subcommands
     the bucket. Useful for CI pipelines that want to gate on the
     canonical hash before granting write capability.
 
-``revoke`` (Sprint-6 Tag-2)
+``revoke``
     Apply an explicit revocation to an existing capability-policy
     record on the ``wakir-capability-policies`` bucket. This
     subcommand does NOT touch the ``wakir-schemas`` schema-registry
@@ -172,17 +172,17 @@ class ExitCode(enum.IntEnum):
     VALIDATION_ERROR = 4  # schema-body shape / id / hash gate failure
     CAS_CONFLICT = 5  # CAS-pin or create-only conflict
     BACKEND_ERROR = 6  # any other backend / transport failure
-    CAPABILITY_DENY = 7  # Sprint-5 Tag-1: --gate decision was a deny
-    REVOCATION_CONFLICT = 8  # Sprint-6 Tag-2: revoke CAS-pin path tripped
-    #                          the Sprint-6 Tag-1 revocation-monotonicity
+    CAPABILITY_DENY = 7  # this module: --gate decision was a deny
+    REVOCATION_CONFLICT = 8  # this module: revoke CAS-pin path tripped
+    #                          the revocation-monotonicity
     #                          invariant (un-revoke or advance-instant).
-    REVOKE_TARGET_NOT_FOUND = 9  # Sprint-6 Tag-2: revoke target
+    REVOKE_TARGET_NOT_FOUND = 9  # this module: revoke target
     #                              (registered_by, policy_id) does not
     #                              exist on the bucket. Distinct from
     #                              INPUT_ERROR so pipelines can detect
     #                              "policy never existed" vs. "operator
     #                              typo in flag".
-    UNREVOKE_TARGET_NOT_REVOKED = 10  # Sprint-6 Tag-7: unrevoke target
+    UNREVOKE_TARGET_NOT_REVOKED = 10  # this module: unrevoke target
     #                                   exists on the bucket but is NOT
     #                                   currently revoked. Distinct from
     #                                   REVOKE_TARGET_NOT_FOUND so
@@ -209,7 +209,7 @@ class PublishReceipt:
     The receipt is JSON-serialisable and stable across modes; the
     ``revision`` field is ``None`` for ``--dry-run``.
 
-    Sprint-5 Tag-1 additions
+This module additions
     ------------------------
 
     Three optional fields surface the capability path; each defaults
@@ -224,11 +224,11 @@ class PublishReceipt:
       ``--gate`` was not requested.
 
     These fields are additive; pipelines that do not opt in to
-    ``--sign`` / ``--gate`` continue to receive the exact pre-Sprint-5
+    ``--sign`` / ``--gate`` continue to receive the exact pre-existing
     receipt shape (with the three optional fields all set to their
     default-off values).
 
-    Sprint-5 Tag-3 additions
+This module additions
     ------------------------
 
     One further field audits the policy-source axis:
@@ -281,7 +281,7 @@ class PublishReceipt:
 
 
 # ---------------------------------------------------------------------------
-# Revoke receipt shape (Sprint-6 Tag-2)
+# Revoke receipt shape
 # ---------------------------------------------------------------------------
 
 
@@ -289,7 +289,7 @@ class PublishReceipt:
 class RevokeReceipt:
     """Canonical receipt printed on stdout on success of ``revoke``.
 
-    Phase-2 Sprint-6 Tag-2 — distinct from :class:`PublishReceipt`
+This module — distinct from :class:`PublishReceipt`
     because the revoke path operates on a different bucket
     (``wakir-capability-policies``) with a different identity-pair
     surface (``registered_by, policy_id``) and a different mutation
@@ -357,7 +357,7 @@ class RevokeReceipt:
 
 
 # ---------------------------------------------------------------------------
-# Unrevoke receipt shape (Sprint-6 Tag-7)
+# Unrevoke receipt shape
 # ---------------------------------------------------------------------------
 
 
@@ -365,7 +365,7 @@ class RevokeReceipt:
 class UnrevokeReceipt:
     """Canonical receipt printed on stdout on success of ``unrevoke``.
 
-    Phase-2 Sprint-6 Tag-7 — distinct from :class:`RevokeReceipt`
+This module — distinct from :class:`RevokeReceipt`
     because the unrevoke path is a **separate deliberate authority
     gesture**, NOT an "undo" of a prior revoke. The audit trail
     explicitly separates revocation events from unrevoke events so
@@ -376,13 +376,13 @@ class UnrevokeReceipt:
     Audit-trail separation rationale
     --------------------------------
 
-    The Sprint-6 Tag-2 ``revoke`` subcommand sets ``revoked_at`` and
+    The ``revoke`` subcommand sets ``revoked_at`` and
     optionally ``revocation_reason`` on a live capability-policy
-    record. The Tag-7 ``unrevoke`` subcommand writes a fully-formed
+    record. The ``unrevoke`` subcommand writes a fully-formed
     record with ``revoked_at=None`` and ``revocation_reason=None``,
     semantically restoring the policy to its pre-revoke state.
 
-    Because the Sprint-6 Tag-1 backend revocation-monotonic
+    Because the backend revocation-monotonic
     invariant forbids ``revoked_at=None`` against a live revoked
     record on the CAS-pin path, unrevoke MUST use the LWW path
     (``put`` rather than ``put_with_revision``). The subcommand is
@@ -510,7 +510,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Apply an explicit revocation to a capability-policy "
             "record on the wakir-capability-policies bucket "
-            "(Sprint-6 Tag-2)."
+            "."
         ),
     )
     _add_revoke_flags(p_rev)
@@ -522,11 +522,11 @@ def build_parser() -> argparse.ArgumentParser:
             "revoked capability-policy record on the "
             "wakir-capability-policies bucket. Writes "
             "revoked_at=None / revocation_reason=None via LWW "
-            "(bypassing the Sprint-6 Tag-1 revocation-monotonic "
+            "(bypassing the revocation-monotonic "
             "backend invariant). Separate subcommand (not a "
             "revoke --undo flag) so the audit trail clearly "
             "separates revocation events from unrevoke events "
-            "(Sprint-6 Tag-7)."
+            "."
         ),
     )
     _add_unrevoke_flags(p_unrev)
@@ -613,7 +613,7 @@ def _add_publish_flags(p: argparse.ArgumentParser) -> None:
 
 
 def _add_capability_flags(p: argparse.ArgumentParser) -> None:
-    """Sprint-5 Tag-1/3 capability flags (shared by ``publish`` and
+    """This module capability flags (shared by ``publish`` and
     ``dry-run``).
 
     Four concerns are wired in:
@@ -627,21 +627,21 @@ def _add_capability_flags(p: argparse.ArgumentParser) -> None:
       ``--gate`` requires ``--sign`` (the gate reads ``kid`` from the
       signature block) AND exactly one policy source.
 
-    - **Policy source** (Sprint-5 Tag-3): exactly one of
+    - **Policy source**: exactly one of
       ``--capability-registry <path>`` (operator-local JSON file,
-      Sprint-5 Tag-1) or ``--capability-bucket`` (persistent
+This module) or ``--capability-bucket`` (persistent
       ``wakir-capability-policies`` NATS-KV bucket loaded via
       :meth:`NatsKvCapabilityPolicyBackend.snapshot_registry`,
-      Sprint-5 Tag-3). The two sources are mutually exclusive at
+This module). The two sources are mutually exclusive at
       argparse level; the gate decision is byte-identical regardless
       of source.
 
     - ``--gate-as-of`` is an optional RFC-3339 timestamp passed to the
       gate as ``as_of``. When omitted, the gate skips validity-window
-      enforcement (consistent with Sprint-4 Tag-6 §5.12 contract).
+      enforcement (consistent with §5.12 contract).
 
     All flags default off; pipelines that omit them retain the
-    pre-Sprint-5 publish surface byte-equal.
+    pre-existing publish surface byte-equal.
     """
 
     p.add_argument(
@@ -687,7 +687,7 @@ def _add_capability_flags(p: argparse.ArgumentParser) -> None:
         "--gate",
         action="store_true",
         help=(
-            "Run the Sprint-4 Tag-6 capability gate on the signed entry "
+            "Run the capability gate on the signed entry "
             "before publishing (requires --sign and exactly one of "
             "--capability-registry or --capability-bucket)."
         ),
@@ -708,7 +708,7 @@ def _add_capability_flags(p: argparse.ArgumentParser) -> None:
         action="store_true",
         help=(
             "Load capability policies from the persistent NATS-KV "
-            "bucket wakir-capability-policies (Sprint-5 Tag-2 backend) "
+            "bucket wakir-capability-policies (this module backend) "
             "via NatsKvCapabilityPolicyBackend.snapshot_registry(). "
             "Mutually exclusive with --capability-registry. Connection "
             "URL defaults to --capability-bucket-connect-url. Required "
@@ -737,7 +737,7 @@ def _add_capability_flags(p: argparse.ArgumentParser) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Sprint-6 Tag-2 — revoke subcommand flags
+# This module — revoke subcommand flags
 # ---------------------------------------------------------------------------
 
 
@@ -754,7 +754,7 @@ def _add_revoke_flags(p: argparse.ArgumentParser) -> None:
       ``--revocation-reason``): the wall-clock instant at which the
       revocation takes effect (RFC-3339 with timezone) and an optional
       free-form audit string. The instant is the canonical surface
-      that downstream gate decisions (Sprint-4 Tag-6 + Sprint-6 Tag-1)
+      that downstream gate decisions
       use to deny.
 
     - **Audit field** (``--registered-by-publisher``): who is
@@ -766,7 +766,7 @@ def _add_revoke_flags(p: argparse.ArgumentParser) -> None:
       CAS-pin is the default (safer); LWW is an explicit opt-in
       escape-hatch for operator-deliberate semantics. CAS-pin requires
       the operator to declare the revision they observed via a prior
-      read; LWW does not. The Sprint-6 Tag-1 revocation-monotonic
+      read; LWW does not. The revocation-monotonic
       backend invariant runs ONLY on CAS-pin, by design.
 
     - **Connection** (``--connect-url``): NATS connect URL for the
@@ -852,8 +852,8 @@ def _add_revoke_flags(p: argparse.ArgumentParser) -> None:
         "--lww",
         action="store_true",
         help=(
-            "Last-write-wins escape-hatch. Bypasses the Sprint-6 "
-            "Tag-1 revocation-monotonic backend invariant; permits "
+            "Last-write-wins escape-hatch. Bypasses the "
+            "this module revocation-monotonic backend invariant; permits "
             "operator-deliberate semantics (e.g. an authorised "
             "un-revoke). Mutually exclusive with --expected-revision. "
             "Default is CAS-pin (no --lww, no --expected-revision => "
@@ -871,7 +871,7 @@ def _add_revoke_flags(p: argparse.ArgumentParser) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Sprint-6 Tag-7 — unrevoke subcommand flags
+# This module — unrevoke subcommand flags
 # ---------------------------------------------------------------------------
 
 
@@ -879,7 +879,7 @@ def _add_unrevoke_flags(p: argparse.ArgumentParser) -> None:
     """Operator-input flags for the ``unrevoke`` subcommand.
 
     The flag surface is narrower than ``revoke`` because the unrevoke
-    gesture is structurally LWW-only (the Sprint-6 Tag-1 revocation-
+    gesture is structurally LWW-only (the revocation-
     monotonic backend invariant forbids ``revoked_at=None`` against a
     live revoked record on the CAS-pin path; an unrevoke is therefore
     by construction a deliberate LWW write). Concretely:
@@ -1029,7 +1029,7 @@ def _parse_registered_at(value: Optional[str]) -> _dt.datetime:
 
 
 # ---------------------------------------------------------------------------
-# Sprint-5 Tag-1 — capability-flag validation, key-loading, registry-loading
+# This module — capability-flag validation, key-loading, registry-loading
 # ---------------------------------------------------------------------------
 
 
@@ -1053,7 +1053,7 @@ def _validate_capability_flag_consistency(args: argparse.Namespace) -> None:
        ``--sign`` / ``--gate`` is a usage error (no-op flag is
        reported, not silently ignored).
 
-    Sprint-5 Tag-3 adds invariant 4's bucket-source axis. The
+    This module adds invariant 4's bucket-source axis. The
     ``--capability-bucket-connect-url`` flag has a non-None default
     so it is not an "orphan" when present without
     ``--capability-bucket``; the connect URL is simply ignored when
@@ -1375,7 +1375,7 @@ ConnectFactory = Callable[
     [str], Awaitable[Tuple[NatsKvSchemaRegistry, Callable[[], Awaitable[None]]]]
 ]
 
-#: Sprint-5 Tag-3 capability-bucket factory type. Mirrors
+#: This module capability-bucket factory type. Mirrors
 #: :data:`ConnectFactory` but yields a
 #: :class:`NatsKvCapabilityPolicyBackend` against the
 #: ``wakir-capability-policies`` bucket. Tests inject a factory that
@@ -1417,7 +1417,7 @@ async def _default_connect_factory(
 async def _default_capability_bucket_factory(
     connect_url: str,
 ) -> Tuple[NatsKvCapabilityPolicyBackend, Callable[[], Awaitable[None]]]:
-    """Default capability-bucket factory (Sprint-5 Tag-3).
+    """Default capability-bucket factory.
 
     Connects to NATS and returns a
     :class:`NatsKvCapabilityPolicyBackend` against the
@@ -1444,7 +1444,7 @@ async def _load_capability_registry_from_bucket(
     factory: CapabilityBucketConnectFactory, connect_url: str
 ) -> CapabilityPolicyRegistry:
     """Load a :class:`CapabilityPolicyRegistry` from the persistent
-    capability-policy bucket (Sprint-5 Tag-3).
+    capability-policy bucket.
 
     Opens the bucket via ``factory(connect_url)``, calls
     :meth:`NatsKvCapabilityPolicyBackend.snapshot_registry` and closes
@@ -1516,7 +1516,7 @@ async def _run_publish(
             registered_at=registered_at,
             supersedes=args.supersedes,
         )
-        # Sprint-5 Tag-1: optional sign + gate pipeline. Both run
+# This module: optional sign + gate pipeline. Both run
         # strictly between entry construction and backend write; a
         # deny short-circuits before the connect call so the bucket
         # is not touched.
@@ -1528,7 +1528,7 @@ async def _run_publish(
             signed_entry = sign_entry(entry, priv_key, kid=args.kid)
         if getattr(args, "gate", False):
             assert signed_entry is not None  # consistency check above
-            # Sprint-5 Tag-3: two policy sources, mutually exclusive.
+# This module: two policy sources, mutually exclusive.
             if getattr(args, "capability_bucket", False):
                 factory = (
                     capability_bucket_factory
@@ -1579,7 +1579,7 @@ async def _run_publish(
         _print_error_stderr(ExitCode.VALIDATION_ERROR, str(exc), stderr)
         return int(ExitCode.VALIDATION_ERROR)
     except CapabilityPolicyBackendError as exc:
-        # Sprint-5 Tag-3: poisoned bucket envelope or non-JSON value.
+# This module: poisoned bucket envelope or non-JSON value.
         _print_error_stderr(ExitCode.VALIDATION_ERROR, str(exc), stderr)
         return int(ExitCode.VALIDATION_ERROR)
 
@@ -1650,7 +1650,7 @@ async def _run_revoke(
 ) -> int:
     """Apply an explicit revocation to a capability-policy record.
 
-    Phase-2 Sprint-6 Tag-2 — operator surface for the Sprint-6 Tag-1
+This module — operator surface for this module
     backend axis. The flow is intentionally narrow:
 
     1. Parse + validate the revocation payload (``--revoked-at`` must
@@ -1679,7 +1679,7 @@ async def _run_revoke(
          error than the backend's post-update CAS exception).
        - default + no ``--expected-revision``: CAS-pin pinned to the
          live revision read in step 3 (auto-pin path).
-       - ``--lww``: LWW via :meth:`put`. Bypasses the Sprint-6 Tag-1
+       - ``--lww``: LWW via :meth:`put`. Bypasses this module
          backend revocation-monotonic invariant.
     6. Emit the canonical :class:`RevokeReceipt` on stdout.
 
@@ -1897,9 +1897,9 @@ async def _run_unrevoke(
 ) -> int:
     """Apply an operator-deliberate unrevoke to a capability-policy record.
 
-    Phase-2 Sprint-6 Tag-7 — separate-subcommand counterpart of the
-    Sprint-6 Tag-2 ``revoke`` path. The unrevoke is structurally an
-    LWW write because the Sprint-6 Tag-1 revocation-monotonic backend
+This module — separate-subcommand counterpart of the
+This module ``revoke`` path. The unrevoke is structurally an
+    LWW write because the revocation-monotonic backend
     invariant forbids ``revoked_at=None`` against a live revoked
     record on the CAS-pin path; the only authorised way to unrevoke
     is therefore via the LWW path with a fully-formed unrevoked
@@ -2022,8 +2022,8 @@ async def _run_unrevoke(
 
         # Step 5 — construct the rewritten record. revoked_at and
         # revocation_reason are explicitly cleared; every other
-        # capability-bundle field is preserved byte-equally. Sprint-6
-        # Tag-9: attach an :class:`UnrevokeAuditMarker` so the
+        # capability-bundle field is preserved byte-equally. this module
+# This module: attach an :class:`UnrevokeAuditMarker` so the
         # watch-side classifier can authenticate the operator-
         # deliberate gesture and surface
         # :attr:`RevocationEventKind.EXPLICIT_UNREVOKE` (vs. the
@@ -2073,7 +2073,7 @@ async def _run_unrevoke(
             return int(ExitCode.VALIDATION_ERROR)
 
         # Step 6 — LWW write. The CAS-pin path is structurally
-        # unavailable for unrevoke (the Sprint-6 Tag-1 backend
+        # unavailable for unrevoke (the backend
         # invariant would refuse revoked_at=None against a live
         # revoked record). LWW is the only authorised path; making it
         # implicit-only (no --lww flag) keeps the operator contract
@@ -2154,7 +2154,7 @@ async def _run_dry_run_async(
         # Run the same key-derivation gate that put() runs (so a malformed
         # triple fails dry-run, not just the live publish).
         _ = key_for_triple(entry.layer, entry.name, entry.version)
-        # Sprint-5 Tag-1: optional sign + gate pipeline (dry-run also).
+# This module: optional sign + gate pipeline (dry-run also).
         if getattr(args, "sign", False):
             priv_key = _load_ed25519_priv_key(
                 hex_value=args.ed25519_priv_key_hex,
@@ -2163,7 +2163,7 @@ async def _run_dry_run_async(
             signed_entry = sign_entry(entry, priv_key, kid=args.kid)
         if getattr(args, "gate", False):
             assert signed_entry is not None
-            # Sprint-5 Tag-3: two policy sources, mutually exclusive.
+# This module: two policy sources, mutually exclusive.
             if getattr(args, "capability_bucket", False):
                 factory = (
                     capability_bucket_factory
@@ -2214,7 +2214,7 @@ async def _run_dry_run_async(
         _print_error_stderr(ExitCode.VALIDATION_ERROR, str(exc), stderr)
         return int(ExitCode.VALIDATION_ERROR)
     except CapabilityPolicyBackendError as exc:
-        # Sprint-5 Tag-3: poisoned bucket envelope or non-JSON value.
+# This module: poisoned bucket envelope or non-JSON value.
         _print_error_stderr(ExitCode.VALIDATION_ERROR, str(exc), stderr)
         return int(ExitCode.VALIDATION_ERROR)
 
@@ -2272,7 +2272,7 @@ def run(
 
     ``argv`` defaults to ``sys.argv[1:]``. ``connect_factory`` defaults
     to :func:`_default_connect_factory` which requires nats-py at
-    runtime. ``capability_bucket_factory`` (Sprint-5 Tag-3) defaults to
+    runtime. ``capability_bucket_factory`` defaults to
     :func:`_default_capability_bucket_factory` and is used only when
     ``--capability-bucket`` is set. Tests inject factories that return
     in-memory backends.

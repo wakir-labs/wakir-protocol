@@ -31,7 +31,10 @@ major-version bump.
   document, WAT manifest v2, Wirelang layers 0/1/2/3,
   recovery-drill, and federation-trust document. Each schema is
   version-pinned and accompanied by test vectors under
-  `tests/fixtures/`.
+  `tests/fixtures/`. The shared proof-path Merkle vectors
+  (`tests/fixtures/proof-path-vectors/`) are consumed by all three
+  repositories; `wakir-inclusion-proof-v1.json` is the (stub) schema
+  for the proof document they carry.
 - **Capability-token envelope** — the Layer-3 wrapper around
   AIP + Biscuit, specified in
   [`docs/layer-3-capability-token-spec.md`](docs/layer-3-capability-token-spec.md).

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for the Wirelang schema-registry CAS-pin path.
 
-Phase-1b Sprint-3 Tag-3 (S3-3). Tests the additive CAS-pin surface
+This module (S3-3). Tests the additive CAS-pin surface
 on :mod:`wakir_protocol.schemas.registry_nats_kv_backend`:
 
 - :meth:`NatsKvSchemaRegistry.get_with_revision`
@@ -9,11 +9,11 @@ on :mod:`wakir_protocol.schemas.registry_nats_kv_backend`:
 - :class:`SchemaRegistryConflictError`
 
 The CAS-pin path is the lost-update protection contract for
-concurrent schema-registry upserts (spec §5.4). The Tag-1 LWW path
-(``put`` / ``get`` / ``snapshot``) is unaffected; Tag-3 surfaces are
+concurrent schema-registry upserts (spec §5.4). The LWW path
+(``put`` / ``get`` / ``snapshot``) is unaffected; This module surfaces are
 purely additive.
 
-Pattern source for the CAS-aware mock KV: V-908 Tag-6
+Pattern source for the CAS-aware mock KV: V-908 this module
 ``_MockKv`` extended with revision-aware ``update``. The
 ``_MockKvCas`` class below mirrors nats-py's KeyValue.update
 contract: ``update(key, value, last=expected_revision)`` raises
@@ -169,7 +169,7 @@ class _MockKvNoCas:
 
 
 # ---------------------------------------------------------------------------
-# Fixtures (mirror Tag-1 fixture shape)
+# Fixtures (mirror this module fixture shape)
 # ---------------------------------------------------------------------------
 
 
@@ -452,8 +452,8 @@ def test_t_sr_cas_08_interleaved_pair_exactly_one_wins():
 
 def test_t_sr_cas_09_cas_and_lww_orthogonal():
     """T-SR-CAS-09: a CAS-pinned put followed by a non-CAS put is
-    observable: the non-CAS put wins (LWW path). Tag-3 CAS-pin and
-    Tag-1 LWW remain orthogonal.
+    observable: the non-CAS put wins (LWW path). This module CAS-pin and
+This module LWW remain orthogonal.
     """
     backend = NatsKvSchemaRegistry(kv=_MockKvCas())
     e0 = _make_entry()
@@ -486,7 +486,7 @@ def test_t_sr_cas_10_kv_without_cas_surface_raises_backend_error():
     entry = _make_entry()
 
     async def _go():
-        # Direct put works (LWW path, Tag-1 unchanged).
+        # Direct put works (LWW path, this module unchanged).
         rev = await backend.put(entry)
         # CAS-pin attempt must fail explicitly.
         await backend.put_with_revision(entry, rev)

@@ -4,7 +4,7 @@
 Loads the three Layer-0/1/2 JSON-Schema documents and the example frames,
 and exposes them as pytest fixtures consumed by the per-layer test modules.
 
-Sandbox-CI note (Tag-11)
+Sandbox-CI note
 ------------------------
 
 The validator fixtures lazy-import :mod:`jsonschema` via
@@ -27,7 +27,7 @@ import pytest
 
 
 # ---------------------------------------------------------------------------
-# Asyncio test support (Sprint-Pengine-10 OI-PEFR-6/7 hermetic tests).
+# Asyncio test support (OI-PEFR-6/7 hermetic tests).
 #
 # We do NOT depend on pytest-asyncio (Bug-34c structural-fix discipline:
 # the test surface stays pure-stdlib + pytest). Instead we register a
@@ -39,7 +39,7 @@ import pytest
 def pytest_configure(config):
     config.addinivalue_line(
         "markers",
-        "asyncio: run the test coroutine with asyncio.run (Sprint-Pengine-10).",
+        "asyncio: run the test coroutine with asyncio.run.",
     )
 
 
