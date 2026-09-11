@@ -1,14 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 """SPIFFE Workload API adapter — wirelang-side surface stub + mock impl.
 
-Phase: Phase-2 Sprint-6 Tag-5 (skeleton + MOCK functional implementation
-for ``fetch_jwt_svid``; ``fetch_x509_svid`` remains stub).
+Scope: skeleton + MOCK functional implementation
+for ``fetch_jwt_svid``; ``fetch_x509_svid`` remains stub.
 Status: surface contract, type annotations, docstrings, mock impl. Real
-upstream-``spiffe``-backed implementation deferred to Sprint-6 Tag-6+ /
-Phase-2c (paired with the DevOps-track SPIRE-server integration on Kai's
+upstream-``spiffe``-backed implementation deferred to
+Phase-2c (paired with the DevOps-track SPIRE-server integration on the DevOps track's
 track).
 
-Sprint-6 Tag-5 additive note: :class:`MockSpiffeWorkloadApiAdapter` is
+This module additive note: :class:`MockSpiffeWorkloadApiAdapter` is
 added below the Protocol surface as a deterministic in-process
 implementation suitable for unit tests and orchestrator integration
 tests that need a typed adapter without provisioning a SPIRE agent.
@@ -44,7 +44,7 @@ Three reasons motivate the indirection (see
    re-coordination signal. The adapter makes the trigger explicit and
    localised.
 
-Surface contract (Sprint-6 Tag-4)
+Surface contract
 =================================
 
 This skeleton defines:
@@ -65,7 +65,7 @@ Functional implementation (the wrap-and-delegate over ``spiffe``) is
 deferred. The skeleton is sufficient for downstream consumers to
 import-pin against and for downstream type-checkers to verify against;
 the actual ``await`` paths will raise :class:`NotImplementedError` from
-the concrete implementation slot until Sprint-6 Tag-5+ / Phase-2c lands
+the concrete implementation slot until / Phase-2c lands
 it.
 
 Implementation cross-references
@@ -78,7 +78,7 @@ Implementation cross-references
   surface authority (per Component-Type).
 - Z-A-Ack 2026-05-11 §3 + §7 — PyPI-package-name correction and
   adapter-layer agreement.
-- Kai DevOps-track items (Sprint-6 Tag-5+ / Phase-2c):
+- DevOps track items (this module / Phase-2c):
   SPIRE-server topology, workload-attestation policy, NATS-JWT
   ``user_jwt_cb`` callback pattern.
 """
@@ -119,7 +119,7 @@ class JwtSvid:
     - ``expires_at``: the JWT ``exp`` claim as a timezone-aware UTC
       datetime. The Workload API typically issues short-lived SVIDs
       (minutes); ``user_jwt_cb`` refresh-on-expiry is the standard
-      NATS-JWT consumption pattern (Kai-track).
+      NATS-JWT consumption pattern (DevOps track).
 
     Frozen: callers can put :class:`JwtSvid` instances into sets and
     use them as dict keys without surprise.
@@ -193,7 +193,7 @@ class SpiffeAdapterUnavailable(SpiffeAdapterError):
 
     Consumers should treat this as a transient error and retry with
     backoff; long-term unavailability is an operational issue for the
-    DevOps track (Kai).
+    DevOps track.
     """
 
 
@@ -230,7 +230,7 @@ class SpiffeAdapterAudienceRejected(SpiffeAdapterError):
 class SpiffeWorkloadApiAdapter(Protocol):
     """Wirelang-side SPIFFE Workload API surface.
 
-    Concrete implementation deferred to Sprint-6 Tag-5+ / Phase-2c. The
+    Concrete implementation deferred to / Phase-2c. The
     surface is defined as a :class:`Protocol` so callers can type-pin
     against it without forcing a concrete dependency on the upstream
     ``spiffe`` package at the persona-container layer.
@@ -315,7 +315,7 @@ class SpiffeWorkloadApiAdapter(Protocol):
 
 
 # ---------------------------------------------------------------------------
-# Mock implementation (Sprint-6 Tag-5; hermetic, no network, no FS)
+# Mock implementation (hermetic, no network, no FS)
 # ---------------------------------------------------------------------------
 
 

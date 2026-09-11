@@ -4,10 +4,10 @@
 # Bridge-Forward-Pipe — Doppelbetrieb-Auftrags-Mirror Spec (v1)
 
 **Spec ID:** `wirelang/specs/bridge-forward-pipe-v1`
-**Status:** Draft (Sprint-10 Tag-6 substrate-closer)
-**Owner:** Tomás Reinhart (Dev-Engineering / Matrix-Lead Bridge-Audit)
-**Cross-Review:** Kai (Zone-I federation-substrate), Reza (Zone-B Wirelang
-schema), Selin (Zone-K persona-engine-bridge).
+**Status:** Draft (this revision substrate-closer)
+**Owner:** Wakir Labs (runtime track)
+**Cross-Review:** the DevOps track (Zone-I federation-substrate), the Wirelang track (Zone-B Wirelang
+schema), persona-engine track (Zone-K bridge).
 **Date:** 2026-05-15
 **Anchor schemas:** `wirelang/schemas/layer-1-wire.json` v0.1.0 (envelope),
 `wirelang/nats/subject_mapping.py` (`agent` domain).
@@ -19,25 +19,25 @@ SPDX-License-Identifier: Apache-2.0
 ## 1 / Scope and Problem
 
 ADR-0058 §Pilot-Phase introduces a 4-week Doppelbetrieb-Vergleich: every
-engineering Auftrag for the Tomás-Persona is meant to run **twice in
-parallel** — once on the Pre-Framework Tomás-Spawn (Mira-Sandbox) and
-once on the Wakir-Runtime Tomás-Container (Pilot-VM `wakir-pilot`). The
+engineering Auftrag for the runtime persona is meant to run **twice in
+parallel** — once on the Pre-Framework runtime-track spawn (operator sandbox) and
+once on the Wakir-Runtime runtime persona-container (Pilot-VM `wakir-pilot`). The
 two outputs feed a 4-axis comparison (functional equivalence, latency,
 cost, audit-trail completeness).
 
-The Sprint-Pengine-8 substrate (PR #65, commit `4ca16ed`) wires the
-**output-side**: the Wakir-Runtime Tomás-Container emits one
+The substrate (PR #65, commit `4ca16ed`) wires the
+**output-side**: the Wakir-Runtime runtime persona-container emits one
 `engineering-output` envelope per tool-call to the Bridge-Audit-Writer.
 
 **Gap (uncovered 2026-05-15 Schritt 9 Live-Bring-up):** the **input-side**
-has no plumbing. When Mira invokes the Pre-Framework Tomás-Spawn via
+has no plumbing. When the operator invokes the Pre-Framework runtime-track spawn via
 ``Agent(subagent_type=dev-engineering, prompt=...)``, the prompt goes
-straight to the Sandbox. The Wakir-Runtime Tomás-Container subscribes
+straight to the Sandbox. The Wakir-Runtime runtime persona-container subscribes
 to nothing — it has no way to see the Auftrag and therefore cannot
 mirror the work.
 
 This spec defines the **Bridge-Forward-Pipe**: a NATS-publish that
-mirrors every Mira-initiated engineering Auftrag onto a subject the
+mirrors every operator-initiated engineering Auftrag onto a subject the
 Wakir-Runtime persona-engine subscribes to. With the output-side
 already wired, this closes the loop and unlocks the Doppelbetrieb-
 Vergleich-4-Wochen-Clock.
@@ -51,7 +51,7 @@ The forward-pipe reuses the existing `agent` domain (§4 of
 event-type (§5.5). The persona-slug `<sub_id>` scopes the subject
 per persona for permission-grain (§7.3 W7).
 
-### 2.1 Subject — Auftrag (Mira → Wakir-Runtime)
+### 2.1 Subject — Auftrag (operator → Wakir-Runtime)
 
 Canonical form:
 
@@ -59,7 +59,7 @@ Canonical form:
 wakir.<env>.agent.agent.task.assigned.<persona-slug>
 ```
 
-Concrete instance for the Tomás-Pilot:
+Concrete instance for the runtime pilot:
 
 ```
 wakir.dev.agent.agent.task.assigned.tomas
@@ -74,7 +74,7 @@ Wildcards (per §7.2 W4, W5):
 
 The Wakir-Runtime persona-engine already emits structured-log JSON via
 the Bridge-Audit-Writer (`wirelang/persona_engine/bridge_audit_writer.py`).
-The Sprint-9 Tag-1 forwarder chain (Selin OI-PEF-13) lifts those
+The forwarder chain (persona-engine OI-PEF-13) lifts those
 emissions into the NATS-KV state-pack bucket. The natural
 companion-subject (when the persona-engine publishes directly to
 NATS instead of letting the forwarder chain transcribe) is:
@@ -83,9 +83,9 @@ NATS instead of letting the forwarder chain transcribe) is:
 wakir.dev.agent.agent.task.completed.<persona-slug>
 ```
 
-The output-side wiring is OUT of scope for this spec — Selin OI-PEFR-3
-async-engine-wrapper owns it (Sprint-Pengine-9). This spec covers ONLY
-the input-side forward (Mira-publish).
+The output-side wiring is OUT of scope for this spec — persona-engine OI-PEFR-3
+async-engine-wrapper owns it. This spec covers ONLY
+the input-side forward (operator-publish).
 
 ---
 
@@ -125,7 +125,7 @@ Layer-1 wire format. Schema anchor:
 | `event_kind` | string | yes | Always `agent.task.assigned` for forward-pipe payloads. |
 | `org_id` | string | yes | Pilot uses `acme`. Multi-org Phase-3a opens this slot. |
 | `persona_id` | string | yes | Persona-slug, lowercase (e.g. `tomas`). |
-| `auftrag_id` | string | yes | Operator-chosen ID; ULID/UUID/Sprint-tag-counter. Round-trip key. |
+| `auftrag_id` | string | yes | Operator-chosen ID; ULID/UUID/counter. Round-trip key. |
 | `ts_utc` | RFC3339 string | yes | UTC, `Z` suffix, second-precision. |
 | `source` | enum | yes | `mira-sandbox` (Pre-Framework-side) or `manual-cli` (operator-injected). |
 | `prompt_sha256` | hex string | yes | `sha256:<64hex>` of UTF-8 prompt bytes. |
@@ -146,7 +146,7 @@ event-atomicity.)
 
 ---
 
-## 4 / Publisher (Mira-Side)
+## 4 / Publisher (operator-Side)
 
 ### 4.1 CLI surface
 
@@ -181,16 +181,16 @@ companion engineering-output subject, picked up by the
 Doppelbetrieb-Score-CLI).
 
 If the NATS server is unreachable, the CLI fails fast (exit 3). The
-operator (Mira-Hand) re-runs after the substrate is back up;
+operator (operator-hand) re-runs after the substrate is back up;
 Continuous-Mode-disposition is "log and proceed", never block the
-Pre-Framework Tomás-Spawn on a forward-pipe glitch.
+Pre-Framework runtime-track spawn on a forward-pipe glitch.
 
 ---
 
 ## 5 / Subscriber (Wakir-Runtime-Side)
 
-OUT of scope for this spec. The async-engine-wrapper (Selin OI-PEFR-3,
-Sprint-Pengine-9) owns the subscribe-loop. The contract this spec
+OUT of scope for this spec. The async-engine-wrapper (persona-engine OI-PEFR-3,
+This revision) owns the subscribe-loop. The contract this spec
 establishes:
 
 - The persona-engine MUST subscribe to
@@ -210,7 +210,7 @@ establishes:
 ## 6 / Doppelbetrieb-Score-CLI (Companion Tool)
 
 The score-CLI compares two outputs (Pre-Framework + Wakir-Runtime) for
-the same `auftrag_id` and emits a 4-axis Score-JSON for Mira-Hand
+the same `auftrag_id` and emits a 4-axis Score-JSON for operator-hand
 review (weekly Doppelbetrieb-Bilanz, ADR-0058 §Pilot-Phase Schritt 10).
 
 ### 6.1 CLI surface
@@ -274,30 +274,30 @@ The score-CLI is intentionally **simple** for v1:
   - `functional_equivalence >= 0.80` → `pass-with-drift`
   - else → `fail`
 
-Mira-Hand-Bilanz can override the verdict at the weekly review.
+operator weekly review can override the verdict at the weekly review.
 
 ---
 
 ## 7 / Cross-Review Hooks
 
-### 7.1 Zone-I (Kai — Federation-Substrate-Ops)
+### 7.1 Zone-I (the DevOps track — Federation-Substrate-Ops)
 
 - **H-1.** Subject-pattern conforms to `agent`-domain reservations
   (§4 of nats-subject-mapping-v1.md).
-- **H-2.** Account-permission grant: Mira's NATS-publish credential
+- **H-2.** Account-permission grant: the operator's NATS-publish credential
   needs `publish=wakir.dev.agent.>` (or scoped per-persona-slug).
   Phase-1b token-auth: this is the operator-edit. Phase-2 JWT-SVID:
   the persona-engine's SVID gains a `caveats.publish` glob.
 
-### 7.2 Zone-B (Reza — Wirelang Schema)
+### 7.2 Zone-B (the Wirelang track — Wirelang Schema)
 
 - **H-3.** New schema `wakir.agent.task-assigned/1` follows the
-  layer-1-wire envelope shape. Reza-side may want to formalise the
+  layer-1-wire envelope shape. Wirelang-side may want to formalise the
   schema in `wirelang/schemas/agent-task-assigned.json` (out-of-scope
   for this PR; document the field-shape here, schema-formalisation
   in a follow-up).
 
-### 7.3 Zone-K (Selin — Persona-Engine-Bridge)
+### 7.3 Zone-K (Persona-Engine-Bridge)
 
 - **H-4.** OI-PEFR-3 subscribe-loop contract (§5): the engine MUST
   subscribe to the canonical subject and MUST honour the
@@ -305,16 +305,16 @@ Mira-Hand-Bilanz can override the verdict at the weekly review.
 
 ---
 
-## 8 / Open Items (Sprint-Tag-Folge)
+## 8 / Open Items (follow-up)
 
-- **OI-1.** Schema-formalisation (Reza Zone-B follow-up):
+- **OI-1.** Schema-formalisation (the Wirelang track Zone-B follow-up):
   `wirelang/schemas/agent-task-assigned.json` with full JCS-canonical
   pattern, additionalProperties: false on the metadata.
-- **OI-2.** JWT-SVID caveat-grant for Mira-publish (Phase-2 transport):
+- **OI-2.** JWT-SVID caveat-grant for operator-publish (Phase-2 transport):
   the trust-domain admin must issue a `publish=wakir.<env>.agent.>`
-  caveat on Mira's SVID. Pre-Phase-2: the token-auth path
+  caveat on the operator's SVID. Pre-Phase-2: the token-auth path
   (NATS_TOKEN env-var) is sufficient.
-- **OI-3.** Multi-persona forward (Reza, Lena, Selin pilot-spawns):
+- **OI-3.** Multi-persona forward (multiple pilot-spawns):
   once additional personas pilot, this spec applies as-is — the
   subject hierarchy already supports `<persona-slug>` wildcards.
 
@@ -330,4 +330,4 @@ Mira-Hand-Bilanz can override the verdict at the weekly review.
   closes the input-side plumbing gap discovered in 2026-05-15 Schritt
   9 Live-Bring-up.
 
-— Tomás
+— the WAT track

@@ -3,7 +3,7 @@
 
 This module implements the Phase-1b production HTTPS transport for
 fetching AIP documents over the wire. It is the counterpart to the
-DNS-anchor :class:`StdlibDoHResolver` (Tag-5) for the AIP-doc fetch
+DNS-anchor :class:`StdlibDoHResolver` for the AIP-doc fetch
 half of the V-908 federation pipeline (§3.3 "HTTP transport").
 
 V-908 spec §3.3 fixes the transport requirements:
@@ -23,7 +23,7 @@ V-908 spec §3.3 fixes the transport requirements:
 
 The module deliberately uses only the Python standard library
 (``urllib.request``, ``urllib.error``, ``http.client``, ``json``,
-``ssl``) -- this matches the Tag-5 zero-third-party-dep posture of
+``ssl``) -- this matches the zero-third-party-dep posture of
 :mod:`wakir_protocol.identity_substrate.dns_anchor` and keeps the runtime sandbox
 friendly. Tests mock at the urllib boundary; no real HTTPS calls
 ever leave the test process.
@@ -49,7 +49,7 @@ verifier:
 
 This split lets the transport be tested exhaustively in the sandbox
 (where ``rfc8785`` and ``jsonschema`` are not installed) while the
-production AIP-verify pipeline (Phase-1a Tag-21 module) plugs in
+production AIP-verify pipeline (this module module) plugs in
 unchanged.
 
 Cache header semantics
@@ -82,7 +82,7 @@ V-908 spec cross-references:
   credentials, body-size bound, timeout bound.
 * §6.1 ("Phase-1b targets") -- this module is one of the listed
   Phase-1b deliverables (HTTPS backend for AIP-doc fetch, called out
-  in the Tag-7 outbox §5 risk-item 5 as PS-6).
+  in the outbox §5 risk-item 5 as PS-6).
 """
 
 from __future__ import annotations
@@ -559,7 +559,7 @@ class HTTPSDocumentTransport:
 #: into the federation pipeline's
 #: :class:`~wirelang.identity.federation_resolver.AIPDocumentLike`.
 #:
-#: Production deployments bind this to the Phase-1a Tag-21
+#: Production deployments bind this to this module
 #: :class:`wirelang.identity.aip_resolver.AIPResolver`'s verify-and-
 #: project step (consuming JCS-recomputation, schema validation, and
 #: signature verification). Sandbox tests inject a stub that accepts
@@ -602,7 +602,7 @@ class HTTPSAipResolver:
             resolve_federated_aip,
         )
 
-        prod_aip = AIPResolver(...)  # Tag-21 verify pipeline
+        prod_aip = AIPResolver(...)  # this module verify pipeline
 
         def verify(uri, body_bytes, body):
             # Phase-1a verify path consumes raw bytes for JCS:
@@ -614,7 +614,7 @@ class HTTPSAipResolver:
             aip_id, ftd_id, ..., aip_resolver=resolver, ...
         )
 
-    The exact ``verify_from_transport`` shape on the Tag-21
+    The exact ``verify_from_transport`` shape on this module
     ``AIPResolver`` is a Phase-1b follow-up; the contract is captured
     by the :class:`AipVerifyFn` callable so the transport layer is
     not blocked by Phase-1a refactors.

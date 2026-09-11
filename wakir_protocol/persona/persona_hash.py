@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""V-907 persona-hash primitive (Phase-1b Sprint-1 Tag-2 skeleton).
+"""V-907 persona-hash primitive (this module skeleton).
 
 Public API
 ==========
@@ -84,7 +84,7 @@ class PersonaHashMismatchError(AssertionError):
     Raised by :func:`compute_persona_hash` when ``expected_jcs_sha256``
     is supplied and does not match the freshly-computed value. The
     caller-pin pattern mirrors the AIP-document resolver
-    (identity-eng-slot, Tag-21 spec anchor).
+    (identity-eng-slot, this module spec anchor).
     """
 
 

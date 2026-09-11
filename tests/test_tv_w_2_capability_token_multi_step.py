@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""TV-W-2 hermetic Capability-Token Multi-Step Roundtrip (Phase-1b Tag-16).
+"""TV-W-2 hermetic Capability-Token Multi-Step Roundtrip.
 
 Acceptance criteria (per ``wirelang/specs/wirelang-tv-strategy.md`` §2.4
 plus the TV-W-2 Pin-Stability Guarantee in

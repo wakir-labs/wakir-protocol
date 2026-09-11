@@ -4,9 +4,9 @@
 # Wirelang NATS Subject Naming Convention and Mapping — v1
 
 **Spec ID:** `wirelang/specs/nats-subject-mapping-v1`
-**Status:** Draft (Phase-1b Sprint-2 Tag-1, S2-Item I-1)
-**Owner:** Reza Tehrani (Dev-Engineering-2 / Wirelang)
-**Cross-Review:** Kai Nakamura (Federation-Substrate-Ops, Zone H)
+**Status:** Draft (S2-Item I-1)
+**Owner:** Wakir Labs (Wirelang track)
+**Cross-Review:** the DevOps track Nakamura (Federation-Substrate-Ops, Zone H)
 **Date:** 2026-05-07 (`date -u` 2026-05-07T11:04:32Z)
 **Supersedes:** none (formalises the convention sketched in
 `specs/wirelang-spec-v0-2.md` §4 and `specs/layer-0-2-overview.md`
@@ -38,7 +38,7 @@ Phase-1a `layer-0-transport.json` schema left implicit:
 
 Out of scope: stream replication, durable-consumer ACK windows,
 JetStream cluster topology — all operational concerns owned by
-Federation-Substrate-Ops (Kai).
+Federation-Substrate-Ops (DevOps track).
 
 ---
 
@@ -95,12 +95,12 @@ Token rules:
 ## 4 / Reserved Domain Anchors (Phase-1b)
 
 Phase-1b reserves the following `<domain>` tokens. Adding a new
-domain requires this spec's `$id` minor-bump and Kai-acknowledgement.
+domain requires this spec's `$id` minor-bump and the DevOps track-acknowledgement.
 
 | Domain | Purpose | Stream-name convention |
 |---|---|---|
 | `agent` | Agent-task lifecycle (assigned, accepted, completed). | `WAKIR_AGENT_TASK` |
-| `wat` | WAT audit-trail anchors and Merkle-root events (Tomás owner). | `WAKIR_WAT_<topic>` |
+| `wat` | WAT audit-trail anchors and Merkle-root events (WAT-track-owned). | `WAKIR_WAT_<topic>` |
 | `aip` | AIP identity-document publish/rotate/revoke events. | `WAKIR_AIP_<topic>` |
 | `cap` | Capability-token issue / append / seal / revoke events. | `WAKIR_CAP_<topic>` |
 | `federation` | V-908 FTD publish, peer-org admit, federation-route events. | `WAKIR_FEDERATION_<topic>` |
@@ -143,9 +143,9 @@ treat unknown event-types as forward-compatible (skip with metric).
 - `federation.route.added` — `federation_route` topology change.
 - `federation.route.removed` — `federation_route` removal.
 
-### 5.4 `wat` (cross-anchor with Tomás's WAT)
+### 5.4 `wat` (cross-anchor with WAT-side)
 
-WAT is Tomás-owner; this spec only enumerates the cross-integration
+WAT is WAT-track-owned; this spec only enumerates the cross-integration
 event-types that Wirelang consumers may rely on:
 
 - `wat.audit.anchor.created` — new Merkle-root anchored.
@@ -274,7 +274,7 @@ JWT-SVID claims (ADR-0020). Spec-level rules:
 
 ## 8 / Cross-Reference: Schema-Registry Inventory
 
-The mapping module integrates with the Phase-1a-Tag-15
+The mapping module integrates with the Phase-1a-this revision
 Schema-Registry (`schemas/registry.py`). Each NATS subject
 that carries an AIP-Frame envelope binds — via the CloudEvents
 `schemaid` attribute — to one of the eight schemas:
@@ -352,7 +352,7 @@ may be introduced in a v1.1 errata if log-aggregation requires it.
 ## 10 / Determinism Invariants and Tests
 
 The mapping module MUST satisfy the following invariants. Each gets
-a determinism test (8+ tests required for Tag-1 acceptance).
+a determinism test (8+ tests required for acceptance).
 
 | ID | Invariant | Test slug |
 |---|---|---|
@@ -384,11 +384,11 @@ In addition, the test module exercises six negative controls:
 
 ---
 
-## 11 / Open Items (Sprint-2-Folge)
+## 11 / Open Items (Folge)
 
 - **OI-1.** Persona-slug-Registry binding: §6.2 currently reads slugs
   from the `wirelang/identity/aip_document.py` slug derivation. A
-  V-907 Persona-Identity-Registry handover (Selin-Lead, S2-4) will
+  V-907 Persona-Identity-Registry handover (persona-engine lead, S2-4) will
   formalise this. Until then, the mapping module accepts any
   `[a-z][a-z0-9_-]{0,30}` slug.
 - **OI-2.** Multi-org subject-prefix introduction (post-v1) requires
@@ -400,31 +400,31 @@ In addition, the test module exercises six negative controls:
 
 ## 12 / Cross-Review Hooks
 
-### 12.1 Zone H (Federation-Substrate-Ops, Kai)
+### 12.1 Zone H (Federation-Substrate-Ops, the DevOps track)
 
-- **Hook H-1.** §7 wildcard rules — Kai must confirm that NATS
+- **Hook H-1.** §7 wildcard rules — the DevOps track must confirm that NATS
   account-permission templates accommodate W7..W9.
 - **Hook H-2.** §6.4 federation host-slug rule R6 (.→- stripping)
-  — Kai must confirm that DNS-anchor compute path is unaffected
+  — the DevOps track must confirm that DNS-anchor compute path is unaffected
   (FTD `domain` field stays raw FQDN; only NATS subject token uses
   the slug).
 - **Hook H-3.** §10.1 negative-control "unknown domain → soft warn
-  + accept" — Kai-veto-window if SubOps prefers hard reject in
+  + accept" — the DevOps track-veto-window if SubOps prefers hard reject in
   Phase-1b (would tighten R5 spirit to fail-closed).
 
-### 12.2 Zone Z2 (WAT × Wirelang Frame-Integration, Tomás)
+### 12.2 Zone Z2 (WAT × Wirelang Frame-Integration, the WAT track)
 
 - **Hook Z2-Subject.** §5.4 reserves `wat.*` event-types as a
   read-only listening contract for Wirelang consumers. No producer
-  side here. Tomás review optional but recommended at next
+  side here. WAT-track review optional but recommended at next
   weekly cross-review.
 
-### 12.3 Zone Z3 (OTS-Schema-Anker, Tomás)
+### 12.3 Zone Z3 (OTS-Schema-Anker, the WAT track)
 
 - **Hook Z3-Schema-Inventory.** §8 inventory list includes
   `federation-trust-document.json` and the `datalog-caveat.json`
   v0.2.0 bump. Both are already Z3-K1/K2/K3-acknowledged
-  (Phase-1b Tag-15). No new Z3 burden from this spec.
+. No new Z3 burden from this spec.
 
 ---
 
@@ -441,4 +441,4 @@ In addition, the test module exercises six negative controls:
   (only Wakir persona slugs in normative slug positions; "Wakir Labs"
   and "Wakir" are brand-permitted).
 
-— Reza
+— the Wirelang track

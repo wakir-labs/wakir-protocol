@@ -1,6 +1,6 @@
 {
   "label": "tv-w-2-capability-token-multi-step",
-  "spec": "wirelang/specs/wirelang-tv-strategy.md \u00a72 (Phase-1b Tag-16)",
+  "spec": "wirelang/specs/wirelang-tv-strategy.md \u00a72",
   "csc_spec": "wirelang/specs/datalog-caveat-vocabulary-phase-2.md \u00a74 + \u00a76",
   "seed_hex": "000102030405060708090a0b0c0d0e0f",
   "issuer_persona": [
@@ -145,5 +145,5 @@
       ]
     }
   },
-  "pin_pack_sha256": "ddf115456893bd5b15c0ab1c501f22a0b68caaf39a06ec2d2b103e940bdd7532"
+  "pin_pack_sha256": "ba7224f7d7e7886c529ad35779e63d6266686865ee13a43621321675c16028d3"
 }

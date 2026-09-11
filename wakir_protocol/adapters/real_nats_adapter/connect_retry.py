@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 Callandor GmbH and contributors
 #
-# Wirelang NATS-Connect-Retry-Layer (Phase-2 Sprint-9 Tag-5).
+# Wirelang NATS-Connect-Retry-Layer.
 # Licensed under the Business Source License 1.1; Change Date
 # 2030-05-13, Change License Apache-2.0 (per ADR-0059).
 """NATS-connect retry layer for the Pilot-VM live-bring-up
-discrepancy resolution (Sprint-9 Tag-5).
+discrepancy resolution.
 
 Context
 =======
@@ -13,7 +13,7 @@ Context
 The Phase-1b Pilot-VM live-bring-up (2026-05-13) reported a smoke-
 test result that oscillated between 2/6 and 4/6 PASS across
 back-to-back invocations of ``bin/proxmox-bringup-smoke``. The
-Mira-Bug-Bilanz (``2026-05-13-pilot-bringup-bug-bilanz.md``)
+bring-up bug review (``2026-05-13-pilot-bringup-bug-bilanz.md``)
 listed four candidate race conditions:
 
 1. **JWT-Auth-Timing-Race** — NATS-connect issued before the
@@ -56,9 +56,9 @@ checks that flip:
 Hypothesis 3 (socket-permission-drift) is **not** the dominant
 factor: the bug bilanz reports the agent is crash-loop-inactive,
 not socket-permission-failing — when the agent is dead the socket
-does not exist at all (clean FAIL), no race window. Kai Sprint-9
-Tag-5 (Bug-7) owns the primary resolution; this retry-layer is
-defence-in-depth so the smoke-test stops oscillating once Kai's
+does not exist at all (clean FAIL), no race window. the DevOps track this module
+This module (Bug-7) owns the primary resolution; this retry-layer is
+defence-in-depth so the smoke-test stops oscillating once the DevOps track's
 fix lands and the agent is healthy.
 
 The retry layer this module implements
@@ -89,7 +89,7 @@ that:
 The retry layer is **opt-in**: existing callers of
 ``RealNatsConnectionAdapter.connect()`` are unaffected. The smoke-
 test and the bucket-init driver are the two known callers that
-opt in via :func:`connect_with_retry` (see Sprint-9 Tag-5 PR).
+opt in via :func:`connect_with_retry` (see this module PR).
 
 Hermetic-test surface
 =====================
@@ -109,8 +109,8 @@ This module does not open a NATS socket, does not import
 ``nats-py`` eagerly, and does not contact the SPIRE Workload-API.
 It is a pure orchestration layer on top of the existing
 :mod:`wakir_protocol.adapters.real_nats_adapter.adapter` surface. The
-hermetic tests run inside the Mira sandbox per ADR-0051
-(rejected; operative Mira-Hand-Regel: ``claude-dev`` has NO host
+hermetic tests run inside the operator sandbox per ADR-0051
+(rejected; operative operator rule: ``claude-dev`` has NO host
 podman-socket access).
 """
 
@@ -147,7 +147,7 @@ from .adapter import (
 #: Five entries → six attempts (one initial + five retries).
 #: Total worst-case sleep (without jitter): 7.75s. Total with
 #: ±20% jitter upper bound: 9.3s. The schedule is biased toward
-#: short early backoffs because the dominant Sprint-9 Tag-5 race
+#: short early backoffs because the dominant this module race
 #: windows (SVID-cold-start, JetStream-stream-init) clear inside
 #: the first second on a healthy host; the long tail covers
 #: SPIRE-server-restart loops where the agent comes back after a
@@ -346,7 +346,7 @@ def classify_failure(exc: BaseException) -> str:
         return REASON_NATS_PY_CONNECT_FAIL
     # Cooperate with the callback skizze's NatsJwtCallbackCacheEmpty
     # without importing the module. The class name is stable
-    # (Sprint-6 Tag-10) and the message carries the marker.
+    # and the message carries the marker.
     cls_name = type(exc).__name__
     if cls_name == "NatsJwtCallbackCacheEmpty":
         return REASON_JWT_CACHE_COLD

@@ -1,20 +1,20 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 Callandor GmbH and contributors
-"""Bridge-Forward-Pipe publisher CLI — Sprint-10 Tag-6 substrate-closer.
+"""Bridge-Forward-Pipe publisher CLI — substrate-closer.
 
-This module is the Mira-side publisher for the Doppelbetrieb-Auftrags-
+This module is the operator-side publisher for the Doppelbetrieb-Auftrags-
 Mirror (spec: ``wirelang/specs/bridge-forward-pipe-v1.md``).
 
-When Mira runs an engineering Auftrag against the Pre-Framework Tomás-
+When the operator runs an engineering Auftrag against the Pre-Framework WAT-track-
 Spawn (``Agent(subagent_type=dev-engineering, prompt=...)``), this CLI
 mirrors the prompt onto the canonical NATS subject
 
     wakir.<env>.agent.agent.task.assigned.<persona-slug>
 
-so the Wakir-Runtime Tomás-Container can subscribe and execute the same
+so the Wakir-Runtime runtime persona-container can subscribe and execute the same
 Auftrag as a Shadow-Spawn. Output-side wiring (engineering-output
 envelope on the companion subject) is owned by the persona-engine
-async-engine-wrapper (Selin OI-PEFR-3).
+async-engine-wrapper (persona-engine OI-PEFR-3).
 
 Hermetic-test surface (stdout/dry-run path)
 -------------------------------------------
@@ -24,7 +24,7 @@ stdout WITHOUT importing nats-py and WITHOUT touching a NATS server.
 This is the hermetic test surface in
 ``wirelang/tests/cli/test_bridge_forward.py``.
 
-The live-NATS-publish path is exercised by the Mira-Hand-SSH-Smoke-
+The live-NATS-publish path is exercised by the operator SSH smoke-
 Test (Operator-Hand-Pfad, sandbox boundary per
 ``feedback_sandbox_host_trennung.md``).
 
@@ -193,7 +193,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="wakir-bridge-forward",
         description=(
-            "Mira-side Bridge-Forward-Pipe publisher. Mirrors a Tomás-"
+            "operator-side Bridge-Forward-Pipe publisher. Mirrors a WAT-track-"
             "Persona Auftrag onto the Doppelbetrieb-NATS-subject so the "
             "Wakir-Runtime Shadow-Spawn can subscribe and execute in "
             "parallel. Spec: wirelang/specs/bridge-forward-pipe-v1.md"

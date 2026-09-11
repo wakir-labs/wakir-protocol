@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for ``wakir_protocol.identity_substrate.aip_signature_verification_cache``.
 
-Phase-2 Sprint-4 Tag-5. Tests cover the cache hit/miss accounting,
+This module. Tests cover the cache hit/miss accounting,
 TTL-based invalidation (with an injectable monotonic clock for
 determinism), LRU eviction, negative caching (cache stores both
 True and False outcomes), cache-key construction (different inputs
@@ -470,14 +470,14 @@ def test_T_AIP_SVC_10_document_signature_stripped() -> None:
     """``document_signature`` mutation on the doc does NOT change the key.
 
     The cache key uses ``SHA-256(JCS(body without document_signature))``
-    (the same byte-anchor the Sprint-4 Tag-4 transport-fetch layer
+    (the same byte-anchor the transport-fetch layer
     publishes). Re-publishing the document with a *different*
     ``document_signature`` slot but byte-equal everything else MUST
     produce the same cache key (the verify outcome is bound to the
     body, not to whatever signature was attached to the body at fetch
     time).
 
-    This is the cache-key correctness probe for the Tag-5 ↔ Tag-4
+    This is the cache-key correctness probe for the ↔ this module
     byte-identity claim.
     """
     priv, pub = _keypair(_SEED_A)

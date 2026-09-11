@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for ``wakir_protocol.identity_substrate.aip_https_backend`` (V-908 PS-6).
 
-Phase-1b Tag-8 production-form tests. The module under test is
-``wirelang/identity/aip_https_backend.py`` (Tag-8 PS-6 HTTPS-backend
+This module production-form tests. The module under test is
+``wirelang/identity/aip_https_backend.py`` (this module PS-6 HTTPS-backend
 for AIP-document fetch, V-908 §3.3).
 
 All tests are hermetic: a fake ``urlopen`` is injected into
@@ -13,7 +13,7 @@ ETag round-trip) plus the
 :class:`~wakir_protocol.identity_substrate.federation_resolver.AIPResolverLike`
 composition layer.
 
-The Phase-1a Tag-21 ``aip_resolver`` requires ``rfc8785`` and
+The ``aip_resolver`` requires ``rfc8785`` and
 ``jsonschema`` which are not installed in the project sandbox. We
 therefore inject a stub ``verify_fn`` for the
 :class:`HTTPSAipResolver` composition tests; the verify contract

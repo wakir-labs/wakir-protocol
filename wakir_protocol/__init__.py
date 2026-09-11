@@ -19,7 +19,7 @@ Sub-packages:
 - :mod:`wakir_protocol.adapters` — SPIFFE workload-API + NATS adapter
   stubs.
 - :mod:`wakir_protocol.cli` — Apache-licensed CLI helpers (bridge-forward
-  publisher, doppelbetrieb aggregate/score, mira_dispatch).
+  publisher, doppelbetrieb aggregate/score).
 - :mod:`wakir_protocol.wirelang` — frame-builder + NATS subject-mapping
   reference implementation.
 - :mod:`wakir_protocol.examples` — example JSON vectors.

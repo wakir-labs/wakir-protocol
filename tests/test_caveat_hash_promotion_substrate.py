@@ -4,7 +4,7 @@
 These tests cover two phases of the ``caveat_hash(self_hash)`` Class-P
 promotion path:
 
-Phase A (substrate readiness, T-CHP-01..06 + aux, Sprint-2 Tag-2):
+Phase A (substrate readiness, T-CHP-01..06 + aux):
   Verifier-side algorithm "extract self_hash, recompute over the
   surrounding caveat-set excluding the predicate, compare" defined on
   top of §4-CSC. Recomputation is idempotent and order-independent
@@ -15,7 +15,7 @@ Phase A (substrate readiness, T-CHP-01..06 + aux, Sprint-2 Tag-2):
   predicate that *names the very same hash* — because the predicate
   itself is excluded from the recomputation.
 
-Phase B (ratified-promotion, T-CHP-07..11, Sprint-6 Tag-8):
+Phase B (ratified-promotion, T-CHP-07..11):
   ADR-0052 (approved 2026-05-12) ratified Option B — promotion as a
   v0.2.0 → v0.2.1 schema patch. These additional tests pin the
   ratified surface end-to-end: the dedicated pattern-arm admits
@@ -216,11 +216,11 @@ def test_chp_aux_canonical_bytes_are_deterministic_under_dedup() -> None:
 
 
 # ===========================================================================
-# Phase B — ADR-0052 ratified-promotion tests (Sprint-6 Tag-8)
+# Phase B — ADR-0052 ratified-promotion tests
 # ===========================================================================
 #
 # These tests anchor the v0.2.0 → v0.2.1 schema bump. They are the
-# Mira-Trigger-pflichtige acceptance for Tag-8: schema admits the
+# trigger-gated acceptance for this module: schema admits the
 # canonical literal, the TV-W-2 golden pin-pack hash recomputes
 # byte-equal, the residual Class-P reservation (`persona_pin`)
 # still bites, and the v0.2.1 ratification surface is materialised.
@@ -237,7 +237,7 @@ _TV_W_2_PIN_PACK_PATH = (
 # ``pin_pack_sha256`` slot in the TV-W-2 golden fixture; it is the
 # hash of the JCS-canonical body without the hash slot.
 _TV_W_2_PIN_PACK_HASH_GOLDEN = (
-    "ddf115456893bd5b15c0ab1c501f22a0b68caaf39a06ec2d2b103e940bdd7532"
+    "ba7224f7d7e7886c529ad35779e63d6266686865ee13a43621321675c16028d3"
 )
 
 
@@ -250,20 +250,22 @@ def test_chp_07_tv_w_2_pin_pack_hash_golden_matches() -> None:
     """T-CHP-07 — golden ``pin_pack_sha256`` matches ADR-0052 vorlage.
 
     Reads the TV-W-2 golden fixture and asserts that the embedded
-    ``pin_pack_sha256`` field is byte-equal to the hash recorded in
-    ADR-0052's substance vorlage (``ddf11545…d7532``). The v0.2.1
+    ``pin_pack_sha256`` field is byte-equal to the recorded golden hash
+    (``ba7224f7…028d3``; the pre-phase-4 value ``ddf11545…d7532`` differs
+    only by the label scrub of the pin-pack ``spec`` field and is
+    retained in git history before tag ``archive/pre-phase-4``). The v0.2.1
     promotion is **not** a producer-side change to TV-W-2 — the
     builder still computes the same caveat-set hashes per §4-CSC
     because the recompute algorithm excludes ``caveat_hash`` from
     the input set. This test is therefore a pin-stability beleg in
-    the strict sense: the bytes that were pinned at Tag-16 are the
+    the strict sense: the bytes that were pinned at ratification are the
     bytes that are still pinned post-promotion.
     """
     with _TV_W_2_PIN_PACK_PATH.open("r", encoding="utf-8") as fh:
         pin_pack = json.load(fh)
     embedded = pin_pack["pin_pack_sha256"]
     assert embedded == _TV_W_2_PIN_PACK_HASH_GOLDEN, (
-        "TV-W-2 pin-pack hash drifted from ADR-0052 vorlage; "
+        "TV-W-2 pin-pack hash drifted from the recorded golden; "
         f"observed {embedded!r}, expected {_TV_W_2_PIN_PACK_HASH_GOLDEN!r}"
     )
 

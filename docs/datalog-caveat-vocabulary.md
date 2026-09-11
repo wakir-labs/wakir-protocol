@@ -271,11 +271,11 @@ bump (see §6). The JSON-Schema pattern MUST be regenerated in lockstep.
 | Vocabulary version | Wirelang version | Predicate count | Notes |
 |---|---|---|---|
 | v0.1 (this document) | wirelang/0.1 | 18 + 2 (`not_before`, `not_after`) | Phase-1a working set |
-| v0.2 (Phase-2 ratified) | wirelang/0.2 | 22 schema-admitted (N1 + N2) | `datalog-caveat-vocabulary-phase-2.md`, Tag-15 |
+| v0.2 (Phase-2 ratified) | wirelang/0.2 | 22 schema-admitted (N1 + N2) | `datalog-caveat-vocabulary-phase-2.md`, this revision |
 
 Future revisions:
 
-- v0.2 (Phase-1b ratified, Tag-15 2026-05-07):
+- v0.2 (Phase-1b ratified, this revision 2026-05-07):
   `datalog-caveat-vocabulary-phase-2.md` adds the Caveat-Set
   Canonicalisation Rule (§4-CSC), promotes `peer_org` and
   `federation_route` to schema-admitted N2-federation predicates,

@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""V-907 persona-hash test suite (Phase-1b Sprint-1 Tag-2).
+"""V-907 persona-hash test suite.
 
 Coverage map
 ------------

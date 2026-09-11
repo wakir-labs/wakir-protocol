@@ -28,7 +28,7 @@ Hermetic boundaries:
   to spot-check that the structural validator and the JSON Schema
   agree on the test vectors.
 
-The test loader follows the Tag-5 two-path strategy
+The test loader follows the two-path strategy
 (see ``test_dns_anchor.py`` for the rationale): try the package
 import first, fall back to a direct file load when the eager
 ``wirelang/identity/__init__.py`` fails on a missing optional

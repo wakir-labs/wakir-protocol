@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """Determinism and rule-conformance tests for
-:mod:`wakir_protocol.wirelang.nats_subject_mapping` (Phase-1b Sprint-2 Tag-1, S2-Item I-1).
+:mod:`wakir_protocol.wirelang.nats_subject_mapping` (S2-Item I-1).
 
 Test-IDs map to the determinism invariants T-NSM-01..T-NSM-10 documented
 in ``specs/nats-subject-mapping-v1.md`` §10. Six negative-control tests
@@ -162,7 +162,7 @@ def test_nsm_09_schema_for_subject_advisory():
          "https://wakir.dev/wirelang/schema/federation-trust-document/0.1.0"),
         ("wakir.prod.agent.agent.task.assigned",
          "https://wakir.dev/wirelang/schema/layer-2-semantic/0.1.0"),
-        ("wakir.prod.wat.wat.audit.anchor.created", None),  # Tomás-owner
+        ("wakir.prod.wat.wat.audit.anchor.created", None),  # WAT-track-owned
     ]
     for subject, expected in cases:
         assert schema_for_subject(subject) == expected, f"{subject!r}"
@@ -267,7 +267,7 @@ def test_no_sub_id_event_types_with_dots():
 
 def test_persona_slug_extracts_only_known_form():
     """persona_slug returns None for non-persona-slug forms."""
-    assert persona_slug("Reza") is None  # uppercase
+    assert persona_slug("Alice") is None  # uppercase
     assert persona_slug("0reza") is None  # starts with digit
     assert persona_slug("a" * 32) is None  # too long
     assert persona_slug("reza_dev") == "reza_dev"

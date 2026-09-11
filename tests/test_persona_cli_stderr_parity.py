@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Operator CLI stderr-Wording-Byte-Parität test pack (Phase-1b Sprint-6
-Tag-6 — Item 1).
+"""Operator CLI stderr-Wording-Byte-Parität test pack (this module
+This module — Item 1).
 
 Cross-language byte-parity hardening for the error-path stderr surface
 of the four ``wakir-persona`` subcommands (``migrate``, ``validate``,
@@ -75,7 +75,7 @@ below. The sister Rust pack pins the same constants in
 any future wording change has to land in both packs in the same box
 or one of them fails CI immediately.
 
-The Tag-5 ``test_persona_cli_help_text`` pack pinned the *info*
+The ``test_persona_cli_help_text`` pack pinned the *info*
 surface (``--help``); this pack pins the *error* surface.
 """
 

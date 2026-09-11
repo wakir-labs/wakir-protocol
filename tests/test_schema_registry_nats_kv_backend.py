@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for the Wirelang schema-registry NATS-KV backend.
 
-Phase-1b Sprint-3 Tag-1 (S3-1). Tests the production-target backend
+This module (S3-1). Tests the production-target backend
 :mod:`wakir_protocol.schemas.registry_nats_kv_backend` against an in-memory
-mock that mirrors Kai's Tag-1 mock JetStream surface
+mock that mirrors the DevOps track's this module mock JetStream surface
 (``tests/orchestrator/test_init_nats_buckets.py``) and the V-908
 backend mock pattern
 (``tests/test_federation_route_registry_nats_kv_backend.py``).
@@ -364,7 +364,7 @@ def test_t_sr_10_bucket_config_matches_documented_inventory():
     """T-SR-10: the module-level ``BUCKET_NAME`` and ``BUCKET_CONFIG``
     constants match the Phase-1 documented inventory.
 
-    Cross-reference: this slot is shared with Kai's
+    Cross-reference: this slot is shared with the DevOps track's
     :data:`PHASE_1_BUCKETS[0]` in
     ``scripts/init-nats-buckets.py``. A drift here is a contract
     violation between the orchestrator-side init and the wirelang-

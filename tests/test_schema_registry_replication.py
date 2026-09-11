@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 """Hermetic tests for the Wirelang schema-registry replication layer.
 
-Phase-1b Sprint-3 Tag-6 (S3-6). Tests the replication layer that
-composes Tag-3 CAS-pin, Tag-4 watch-stream, and Tag-1 LWW into a
+This module (S3-6). Tests the replication layer that
+composes this module CAS-pin, this module watch-stream, and LWW into a
 single one-way (source → target) replicator:
 
 - :class:`SchemaReplicator` (run / bootstrap / event loop)
@@ -13,14 +13,14 @@ single one-way (source → target) replicator:
 
 The replication layer is the OI-7-Phase-1c-replication slot landing
 for the schema-registry backend; it is the last Phase-1c slot. The
-Tag-1 LWW path (``put`` / ``get`` / ``snapshot``), the Tag-3 CAS-pin
-path (``put_with_revision`` / ``get_with_revision``), and the Tag-4
+This module LWW path (``put`` / ``get`` / ``snapshot``), the CAS-pin
+path (``put_with_revision`` / ``get_with_revision``), and this module
 watch-stream path (``watch`` / ``WatchEvent`` / ``LiveSchemaSnapshot``)
-are unaffected; Tag-6 surfaces are purely additive.
+are unaffected; This module surfaces are purely additive.
 
-Pattern source: there is no V-908 replication module to mirror; Tag-6
+Pattern source: there is no V-908 replication module to mirror; this module
 is the canonical Wakir-internal replication template. The mock KV
-shape mirrors the Tag-4 watch-stream test pattern (Shape-2 watcher
+shape mirrors the watch-stream test pattern (Shape-2 watcher
 with ``await updates()`` + sentinel-None close).
 
 Test inventory (T-SR-REP-01..12):
@@ -90,7 +90,7 @@ from wakir_protocol.schemas.replication import (
 
 
 # ---------------------------------------------------------------------------
-# Mock KV with watch + CAS surfaces (mirror of Tag-4 watch test pattern)
+# Mock KV with watch + CAS surfaces (mirror of watch test pattern)
 # ---------------------------------------------------------------------------
 
 

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Tag-9 ``verify_from_transport`` bridge test suite.
+"""This module ``verify_from_transport`` bridge test suite.
 
 Seven tests covering the seven ``VerifyError.kind`` outcomes plus
-the happy path (Tag-9 spec § 2.5):
+the happy path (spec § 2.5):
 
   1  Happy path — AIP body roundtrip with valid signature.
   2  ``transport-failed`` — transport raises an exception.
@@ -347,7 +347,7 @@ def test_hash_pin_mismatch_returns_hash_mismatch_kind() -> None:
 
 # ---------------------------------------------------------------------------
 # PS-7 wiring: make_https_aip_verify_fn returns a verify_fn callable
-# compatible with the Tag-8 HTTPSAipResolver constructor.
+# compatible with the HTTPSAipResolver constructor.
 # ---------------------------------------------------------------------------
 
 
@@ -383,9 +383,9 @@ def test_make_https_aip_verify_fn_raises_on_bad_signature() -> None:
 
 
 def test_make_https_aip_verify_fn_with_https_aip_resolver_end_to_end() -> None:
-    """End-to-end PS-7 wiring: Tag-8 HTTPSAipResolver + Tag-9 verify_fn.
+    """End-to-end PS-7 wiring: This module HTTPSAipResolver + this module verify_fn.
 
-    Uses Tag-8's transport with a stub urlopen so no network is touched.
+    Uses the earlier increment's transport with a stub urlopen so no network is touched.
     """
     cryptography_mod = pytest.importorskip("cryptography")
 

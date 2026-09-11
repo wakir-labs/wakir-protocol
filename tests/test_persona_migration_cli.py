@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Operator CLI test pack (Phase-1b Sprint-2 Tag-3, S2-T1-06).
+"""Operator CLI test pack (S2-T1-06).
 
 Covers the ``wakir-persona migrate`` entry-point declared in
 ``pyproject.toml`` and implemented in
