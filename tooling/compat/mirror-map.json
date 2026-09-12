@@ -1,0 +1,36 @@
+{
+  "schema": "wakir-compat-mirror-map/v1",
+  "canonicalisation": "sha256(JCS(strip(doc))) — RFC 8785; strip at every depth the string-valued members named 'description' and the string-valued members whose key starts with 'x-spdx-'; nothing else. Reference: tooling/compat/canon.py",
+  "repos": {
+    "runtime": {
+      "clone": "https://github.com/wakir-labs/wakir-runtime",
+      "mirrors": [
+        {"kind": "schema", "protocol": "wakir_protocol/schemas/*.json", "other": "wirelang/schemas/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": false,
+         "note": "runtime adds the mirror in its Phase-4 W4 compat PR; flip required to true afterwards"},
+        {"kind": "vector", "protocol": "tests/fixtures/jcs-leaf-vectors/*.json", "other": "tests/fixtures/jcs-leaf-vectors/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/aip-document-vectors/*.json", "other": "tests/fixtures/aip-document-vectors/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/bip32-vectors/*.json", "other": "tests/fixtures/bip32-vectors/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/did-document-vectors/*.json", "other": "tests/fixtures/did-document-vectors/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/slip0010-ed25519-vectors/*.json", "other": "tests/fixtures/slip0010-ed25519-vectors/", "required": true},
+        {"kind": "vector", "protocol": "tests/fixtures/wakir-ftd-vectors/*.json", "other": "tests/fixtures/wakir-ftd-vectors/", "required": true}
+      ],
+      "version_constants": [
+        {"path": "wat/cmd/aggregator_cli.py", "regex": "^MANIFEST_VERSION\\s*=\\s*\"([^\"]+)\"", "declared_in": "manifest"}
+      ]
+    },
+    "verify": {
+      "clone": "https://github.com/wakir-labs/wakir-verify",
+      "mirrors": [
+        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": false,
+         "note": "verify adds the mirror in its Phase-4 W4 compat PR; flip required to true afterwards"}
+      ],
+      "version_constants": []
+    }
+  },
+  "excluded": [
+    {"path": "tests/fixtures/schema-registry/", "reason": "OTS schema-registry anchor fixture; digest pin is stale on both sides and the fixture is not on the proof path. Cross-Review Zone 3 open item (re-pin or delete)."},
+    {"path": "tests/fixtures/tv-w-1/, tests/fixtures/tv-w-2/, tests/fixtures/persona_definitions/", "reason": "protocol-only fixtures, no mirror"},
+    {"path": "wakir_protocol/**/*.py", "reason": "Python sources are not JSON; code-level mirroring is out of scope for the schema-set gate"}
+  ]
+}

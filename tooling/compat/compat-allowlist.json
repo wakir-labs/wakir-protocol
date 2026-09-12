@@ -1,0 +1,12 @@
+{
+  "schema": "wakir-compat-allowlist/v1",
+  "entries": [
+    {
+      "repo": "runtime",
+      "path": "wakir_protocol/schemas/wakir-inclusion-proof-v1.json",
+      "reason": "runtime@main still carries the W2 draft (x-canonical-home prose, placeholder examples); protocol now holds the canonical copy. runtime re-mirrors it in its W4 compat PR, after which this entry is deleted.",
+      "until": "2026-09-30",
+      "tracking": "https://github.com/wakir-labs/wakir-protocol/pull/6"
+    }
+  ]
+}
