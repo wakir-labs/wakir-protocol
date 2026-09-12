@@ -9,14 +9,24 @@ License: This document is licensed under the Creative Commons Attribution
 
 ---
 spec: wirelang-schema-registry
-version: 0.37.0
+version: 0.38.0
 status: draft
-date: 2026-05-15
+date: 2026-09-11
 audience: implementers, integrators, operators
 license: CC-BY-4.0
 ---
 
-# Wirelang Schema Registry — NATS-KV Backend Specification (v0.37.0)
+# Wirelang Schema Registry — NATS-KV Backend Specification (v0.38.0)
+
+**v0.38.0 — proof-path registry slot + cross-repo compatibility canon
+(2026-09-11).** Additive minor bump per §3.2. Registers
+`proof/wakir-inclusion-proof-v1/0.1.0` (§3.1) as the tenth slot; the
+on-disk schema replaces the earlier stub with the canonical
+`wakir-inclusion-proof/v1` definition. Introduces the canonicalisation
+rule used to compare mirrored schemas across wakir-protocol,
+wakir-runtime and wakir-verify (`docs/cross-repo-compat.md`,
+`tooling/compat/`). No envelope or bucket-shape changes; the registry
+surface itself is byte-identical to v0.37.0.
 
 **v0.37.0 — Phase-2c Live-HTTPS counterpart adapter
 (2026-05-15).** This version adds one substantive load-bearing
@@ -972,14 +982,23 @@ on-disk file ships in Phase-1b; the entry is registered to make the
 versioning surface explicit and to give Phase-1c a slot for
 historical replay).
 
-**Phase-4 addition (not yet a registry slot):**
-`wakir-inclusion-proof-v1.json` is a stub for the
-`wakir-inclusion-proof/v1` document (self-contained WAT Merkle
-inclusion proof). It pins only the fields exercised by the shared
-proof-path test vectors under `tests/fixtures/proof-path-vectors/`;
-the runtime-side draft is merged and the registry slot is
-registered in the Phase-4 cross-repo compatibility work (ADR-0072
-sub-item 4c).
+**Phase-4 addition (v0.38.0) — proof-path slot:**
+
+| Layer   | Name                        | Version | On-disk basename                 |
+|---------|-----------------------------|---------|----------------------------------|
+| `proof` | `wakir-inclusion-proof-v1`  | `0.1.0` | `wakir-inclusion-proof-v1.json`  |
+
+`$id` `https://wakir.dev/wirelang/schema/wakir-inclusion-proof-v1/0.1.0`;
+document discriminator `schema: "wakir-inclusion-proof/v1"`. A
+self-contained WAT Merkle inclusion proof (leaf hash, bottom-up sibling
+path with `L`/`R` side markers, root, leaf index and count, the
+manifest's `version` as `manifest_version`). wakir-runtime emits it
+(`scripts/demo-proof.sh` step 4) and mirrors the file under
+`wirelang/schemas/`; wakir-verify validates against it. The shared test
+vectors under `tests/fixtures/proof-path-vectors/` carry one document per
+leaf and are the conformance surface for all three repositories. The
+cross-repo `compat` gate (`docs/cross-repo-compat.md`) keeps the mirror
+JCS-identical to this canonical copy. Ten slots total with this row.
 
 ### 3.2 Versioning policy
 

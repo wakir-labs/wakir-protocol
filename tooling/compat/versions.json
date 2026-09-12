@@ -1,0 +1,66 @@
+{
+  "schema": "wakir-compat-versions/v1",
+  "note": "Version level of the compatibility canon: every declared wire-format version maps to exactly one schema $id and to at least one shared test vector. Reserved versions have no producer and no vector; adding the producer requires adding the vector in the same change.",
+  "manifest": {
+    "declared": [
+      {
+        "version": "wakir-wat-manifest/v1",
+        "schema": "wakir_protocol/schemas/wakir-wat-manifest-v1.json",
+        "schema_id": "https://wakir.dev/wirelang/schema/wakir-wat-manifest-v1/0.2.0",
+        "producer_constant": {"repo": "runtime", "path": "wat/cmd/aggregator_cli.py", "symbol": "MANIFEST_VERSION"},
+        "vectors": [
+          "tests/fixtures/proof-path-vectors/vector-1.json",
+          "tests/fixtures/proof-path-vectors/vector-2.json",
+          "tests/fixtures/proof-path-vectors/vector-3.json"
+        ]
+      }
+    ],
+    "reserved": [
+      {
+        "version": "wakir-wat-manifest/v2",
+        "schema": "wakir_protocol/schemas/wakir-wat-manifest-v1.json",
+        "note": "present in the v1 schema's version enum as a forward reservation; no producer, no verify support, no vector"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "versions": ["wat-manifest/1.0", "wat-manifest/2.0"],
+        "schema": "wakir_protocol/schemas/wat-manifest-v2.json",
+        "note": "multi-capability manifest envelope; not on the proof path, not read by wakir-verify (ADR-0072 Phase 4 scope)"
+      }
+    ],
+    "field_map": {
+      "runtime_emits": {"version": "manifest version discriminator", "hour_slot": "UTC hour YYYY-MM-DDTHH", "leaves": "objects with event_id, time, payload_hash, capability_token_hash, leaf_hash"},
+      "verify_reads": {"envelope": "optional; empty string when absent (v1 manifests do not carry it)", "hour": "optional; v1 manifests carry hour_slot instead", "leaves": "objects with at least event_id and leaf_hash", "merkle_root": "required"},
+      "constraint": "wakir-verify's Manifest.envelope and Manifest.hour are empty/None for real v1 manifests; consumers read the version from raw['version'] and the hour from raw['hour_slot']. This divergence is pinned here as a known compatibility constraint, not a bug to fix in either repo without a version bump."
+    }
+  },
+  "inclusion_proof": {
+    "declared": [
+      {
+        "version": "wakir-inclusion-proof/v1",
+        "schema": "wakir_protocol/schemas/wakir-inclusion-proof-v1.json",
+        "schema_id": "https://wakir.dev/wirelang/schema/wakir-inclusion-proof-v1/0.1.0",
+        "vectors": [
+          "tests/fixtures/proof-path-vectors/vector-1.json",
+          "tests/fixtures/proof-path-vectors/vector-2.json",
+          "tests/fixtures/proof-path-vectors/vector-3.json"
+        ]
+      }
+    ]
+  },
+  "proof_path_vector": {
+    "declared": [
+      {
+        "version": "wakir-proof-path-vector/v1",
+        "schema": null,
+        "note": "container format of the shared vectors; layout documented in tests/fixtures/proof-path-vectors/README.md",
+        "vectors": [
+          "tests/fixtures/proof-path-vectors/vector-1.json",
+          "tests/fixtures/proof-path-vectors/vector-2.json",
+          "tests/fixtures/proof-path-vectors/vector-3.json"
+        ]
+      }
+    ]
+  }
+}
