@@ -167,10 +167,25 @@ Actions pinned by commit SHA. Enforce is on; there is no audit mode in CI.
    soon as they land. Two runtime tests are deselected by node id:
    `test_coxsr_03_anchor_manifest_well_formed` and
    `test_coxsr_04_schema_digest_fixture_round_trips` pin the **byte**
-   digest of runtime's own copy of `caveat-override-event-export.json`
-   and cannot hold for any mirror that is allowed to differ in
-   `x-spdx-*`/`description` (Zone 3 follow-up: re-pin on the canonical
-   digest or on the protocol bytes).
+   digest of runtime's own copy of `caveat-override-event-export.json`,
+   which step 4 overlays away. The flags are **not** written in the
+   workflow; they come from the `deselects` block of
+   `tooling/compat/compat-allowlist.json` (§5.2), so they carry an expiry
+   like every other exception.
+
+   Measured 2026-09-15 against `runtime@e1f1555`, for the record, because
+   the reason was previously recorded as a stale pin and that is not what
+   it is: on a **pristine** `runtime@main` the module is 5 passed — the
+   runtime-side pin (`b170ecbf…`, 6958 bytes) matches its live schema
+   file exactly. Only **after** the overlay do COXSR-03/04 fail, because
+   protocol's copy of the same schema (`69fb3bcb…`, 7183 bytes) differs in
+   pretty-print shape and in three `description` strings. Those are
+   precisely the members the canonical schema rule (§2.1) strips, which is
+   why the mirror check reports `ok` while a byte pin cannot. COXSR-04's
+   failure text ("fixture is stale") is therefore a false diagnosis in
+   this condition. Resolution is runtime-side — re-pin on the canonical
+   digest — and is Cross-Review Zone 3:
+   <https://github.com/wakir-labs/wakir-protocol/issues/8>.
 
 ### 4.2 What runtime and verify implement on their side
 
@@ -193,9 +208,15 @@ same rule and the same allowlist format:
 - **Allowlist**: §5 format, protocol-side paths, `until` mandatory and
   checked against the UTC date, `tracking` a wakir-labs PR/issue URL.
 
-## 5. Allowlist policy (bounded waivers only)
+## 5. Exception registry (bounded exceptions only)
 
-File `tooling/compat/compat-allowlist.json`:
+File `tooling/compat/compat-allowlist.json` holds **every** exception the
+gate grants, in two blocks: `entries` waive a mirror finding, `deselects`
+remove a counterpart node id from the step-4 overlay run. Both carry a
+mandatory `until` that is compared against the UTC date at check time, so
+an exception cannot outlive its reason in silence (ADR-0075 §3).
+
+### 5.1 `entries` — mirror waivers
 
 ```json
 {
@@ -227,6 +248,48 @@ expiry and tracking reference; it is never hidden. Validation:
 (the shipped file is loaded with the real date on every CI run, so an
 expiry turns the protocol CI red until the waiver is removed or
 consciously extended).
+
+The block is empty today. The single entry it carried — runtime's copy of
+`wakir-inclusion-proof-v1.json` lagging behind the canonical one — was
+removed on 2026-09-15 because the cause is closed: the two files are now
+byte-identical, and the mirror check reports `ok` rather than
+`allowlisted`. The waiver was not extended.
+
+### 5.2 `deselects` — counterpart test exclusions
+
+```json
+{
+  "repo": "runtime",
+  "node_id": "wirelang/tests/test_example.py::test_case",
+  "reason": "why the overlay run may not execute this node id",
+  "until": "2026-10-31",
+  "tracking": "https://github.com/wakir-labs/wakir-protocol/issues/8"
+}
+```
+
+| Field | Rule |
+|---|---|
+| `repo` | `runtime` or `verify` — the counterpart whose test is excluded |
+| `node_id` | pytest node id **relative to the counterpart clone**; must contain `::`. A bare module path is rejected: deselecting a whole module is the silent-coverage-loss shape this registry exists to prevent |
+| `reason` | why the node id cannot hold under the overlay; free text |
+| `until` | `YYYY-MM-DD`; **mandatory**; same calendar comparison as `entries` |
+| `tracking` | the PR or issue that removes the need for the exclusion |
+
+Duplicate `(repo, node_id)` pairs are invalid. The workflow obtains its
+flags with `python -m tooling.compat.allowlist --deselect-args runtime`
+and must not spell out a `--deselect` itself;
+`test_workflow_takes_its_deselects_from_the_registry` pins that.
+
+An expired deselect fails the gate at **three** independent points, so no
+single step can be softened to hide it: the mirror-check step (the
+registry is validated as a whole, not per block), the flag-emitting step,
+and `test_shipped_deselects_are_valid_today` in the required `pytest`
+lane. Verified by negative control on 2026-09-15 — exit code `1` from
+`check_mirror.py` and from the emitter, 3 failed tests.
+
+Renewal is allowed and deliberately costs a diff: set a new `until`, and
+add `renewed_on`/`renewal_reason` to the PR description at the top, not in
+a footnote. Extending an exception is a decision with an author.
 
 ## 6. Version level
 
