@@ -1,6 +1,6 @@
 {
   "schema": "wakir-compat-mirror-map/v1",
-  "canonicalisation": "sha256(JCS(strip(doc))) — RFC 8785; strip at every depth the string-valued members named 'description' and the string-valued members whose key starts with 'x-spdx-'; nothing else. Reference: tooling/compat/canon.py",
+  "canonicalisation": "schema: sha256(JCS(strip(doc))) — RFC 8785; strip at every depth of the schema structure the string-valued members named 'description' and the string-valued members whose key starts with 'x-spdx-'; never inside instance data (const, default, enum, examples) and never on the member names of (properties, patternProperties, $defs, definitions, dependentSchemas, dependentRequired, $vocabulary); nothing else. vector: sha256(JCS(doc)) — RFC 8785; no stripping at all. Vectors are instance data; every member is part of the contract. Applied per mirror 'kind'. Reference: tooling/compat/canon.py",
   "repos": {
     "runtime": {
       "clone": "https://github.com/wakir-labs/wakir-runtime",

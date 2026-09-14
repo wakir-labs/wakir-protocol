@@ -9,9 +9,9 @@ License: This document is licensed under the Creative Commons Attribution
 
 ---
 spec: wakir-cross-repo-compat
-version: 1.0.0
+version: 1.1.0
 status: active
-date: 2026-09-11
+date: 2026-09-14
 audience: implementers of wakir-runtime and wakir-verify, integrators
 license: CC-BY-4.0
 ---
@@ -29,23 +29,37 @@ set without silently drifting apart (ADR-0072 Phase 4, sub-item 4c).
 
 | Level | Artefact | Canonical location | Compared how |
 |---|---|---|---|
-| Schema | 17 JSON Schema 2020-12 documents | `wakir_protocol/schemas/*.json` (runtime mirrors under `wirelang/schemas/`) | canonical digest, §2 |
+| Schema | 17 JSON Schema 2020-12 documents | `wakir_protocol/schemas/*.json` (runtime mirrors under `wirelang/schemas/`) | canonical digest, §2.1 |
 | Manifest | `wakir-wat-manifest/v1` instance per vector | `tests/fixtures/proof-path-vectors/vector-*.json` → `manifest` | validates against `wakir-wat-manifest-v1.json`; loads with `wakir_verify.manifest`; root re-derives |
-| Test vectors | Merkle leaf → levels → root → inclusion proofs (+ tampered case) | `tests/fixtures/proof-path-vectors/` (plus the older jcs-leaf, aip-document, bip32, did-document, slip0010, wakir-ftd packs) | canonical digest of the files **and** execution through each counterpart's implementation (§4.2) |
+| Test vectors | Merkle leaf → levels → root → inclusion proofs (+ tampered case) | `tests/fixtures/proof-path-vectors/` (plus the older jcs-leaf, aip-document, bip32, did-document, slip0010, wakir-ftd packs) | unstripped JCS digest of the files (§2.2) **and** execution through each counterpart's implementation (§4.2) |
 | Proof format | `wakir-inclusion-proof/v1` | `wakir_protocol/schemas/wakir-inclusion-proof-v1.json`, `$id …/wakir-inclusion-proof-v1/0.1.0` | every `proofs[]` document validates; runtime emits it (`scripts/demo-proof.sh` step 4); verify validates it |
 | Version | `MANIFEST_VERSION` ↔ schema `$id` ↔ vectors | `tooling/compat/versions.json` | one vector per declared version; producer constant read from the runtime clone; enum = declared + reserved |
 
-## 2. Canonicalisation rule (the one rule all three repositories implement)
+## 2. Canonicalisation rules (two artefact kinds, two rules)
+
+Schemas and vectors are compared differently. The applicable rule follows
+the `kind` field of the mirror map (§3).
+
+### 2.1 `kind: "schema"`
 
 ```text
 canonical_digest(doc) = sha256( JCS( strip(doc) ) )
 ```
 
 - `JCS` is RFC 8785 JSON Canonicalization Scheme (`rfc8785.dumps`).
-- `strip` removes, **at every nesting depth**,
+- `strip` removes, **at every nesting depth of the schema structure**,
   1. every object member whose key starts with `x-spdx-` **and whose value is a JSON string**, and
   2. every object member named `description` **whose value is a JSON string**.
-- Nothing else is removed. `$id`, `title`, `examples`, `enum`, `required`,
+- `strip` is **suspended** in two contexts, because a member named
+  `description` is not an annotation there:
+  - **instance data** — the values of `const`, `default`, `enum` and
+    `examples` are kept verbatim at every depth below them;
+  - **name-keyed maps** — in `properties`, `patternProperties`, `$defs`,
+    `definitions`, `dependentSchemas`, `dependentRequired` and
+    `$vocabulary` the member names are author-chosen identifiers, not
+    keywords; the names always survive and the values are stripped as
+    subschemas.
+- Nothing else is removed. `$id`, `title`, `enum`, `required`,
   `additionalProperties` and every other `x-*` key (e.g. `x-canonical-home`)
   are part of the canonical form.
 
@@ -56,9 +70,33 @@ property definitions. Licence headers (`x-spdx-*`) differ by design
 (Apache-2.0 in protocol, BUSL-1.1 in runtime); annotation wording may
 differ; the contract may not.
 
+Why instance data is exempt: the annotation rule used to apply
+everywhere, so `{"const": {"description": "approved"}}` and
+`{"const": {"description": "denied"}}` — two schemas that accept
+*different* instances — produced one digest, and the gate reported green
+for a semantic change. Found by the external re-review of 2026-09-14
+(finding R4). No schema in the three trees was affected at that point:
+all 17 schema digests are byte-identical before and after the
+correction, so this is a repaired blind spot, not a canon migration.
+
+### 2.2 `kind: "vector"`
+
+```text
+vector_digest(doc) = sha256( JCS(doc) )
+```
+
+No stripping at all. A test vector is instance data: every member is
+part of the contract, including one that happens to be called
+`description` (the proof-path vectors carry such members, and the
+jcs-leaf vectors carry `x-spdx-*` members). Formatting, key order and
+unicode escaping are still normalised by JCS — that is the only
+normalisation a vector gets.
+
 Reference implementation: `tooling/compat/canon.py`
-(`strip_noncanonical`, `canonical_bytes`, `canonical_digest`). CLI:
-`python tooling/compat/canonical_schema_digest.py [--json] [PATH …]`.
+(`strip_noncanonical`, `canonical_bytes`, `canonical_digest` for schemas;
+`verbatim_bytes`, `verbatim_digest` for vectors; `digest_file(path, kind)`
+dispatches). CLI: `python tooling/compat/canonical_schema_digest.py
+[--kind schema|vector] [--json] [PATH …]`, `--rule` prints both rules.
 Pinning tests: `tests/test_compat_canon.py`.
 
 Today (2026-09-11) all 17 schemas and all 21 mirrored vector files are
@@ -139,10 +177,11 @@ Actions pinned by commit SHA. Enforce is on; there is no audit mode in CI.
 Both counterparts run their own gate against `protocol@main` with the
 same rule and the same allowlist format:
 
-- **Canonical digest**: §2, byte-for-byte the same algorithm. A
-  convenient cross-check: `python tooling/compat/canonical_schema_digest.py`
-  in a protocol checkout must print the same digest the counterpart
-  computes for its mirrored file.
+- **Canonical digest**: §2.1 for schemas, §2.2 for vectors, byte-for-byte
+  the same algorithm. A convenient cross-check: `python
+  tooling/compat/canonical_schema_digest.py` in a protocol checkout must
+  print the same digest the counterpart computes for its mirrored file
+  (add `--kind vector` for vector packs).
 - **Vectors**: load `tests/fixtures/proof-path-vectors/vector-{1,2,3}.json`
   (mirrored byte-identically or read from the protocol clone). Layout is
   documented in `tests/fixtures/proof-path-vectors/README.md`; each
