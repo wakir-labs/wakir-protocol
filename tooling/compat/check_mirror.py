@@ -15,9 +15,12 @@ What is compared
 ----------------
 
 ``tooling/compat/mirror-map.json`` lists, per counterpart repository,
-glob patterns of protocol-side JSON files and the directory in the
-counterpart that mirrors them. Every file is compared by its canonical
-digest (:mod:`tooling.compat.canon`). Findings per file:
+glob patterns of protocol-side JSON files, the directory in the
+counterpart that mirrors them, and the artefact ``kind``. Every file is
+compared by the canonical digest of its kind (:mod:`tooling.compat.canon`):
+``kind: "schema"`` uses the stripping rule, ``kind: "vector"`` uses the
+unstripped JCS digest — a vector is instance data and every member of it
+is part of the contract. Findings per file:
 
 ``ok``           digests equal
 ``drift``        both present, digests differ                       -> fail
@@ -50,7 +53,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from tooling.compat import allowlist as _allowlist  # noqa: E402
-from tooling.compat.canon import RULE_TEXT, digest_file  # noqa: E402
+from tooling.compat.canon import KINDS, RULE_TEXT, VECTOR_RULE_TEXT, digest_file  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_MIRROR_MAP = REPO_ROOT / "tooling" / "compat" / "mirror-map.json"
@@ -115,6 +118,10 @@ def load_mirror_map(path: Path = DEFAULT_MIRROR_MAP) -> dict[str, Any]:
                     raise ConfigError(f"repos.{name}: mirror entry lacks {key!r}: {mirror}")
             if not isinstance(mirror["required"], bool):
                 raise ConfigError(f"repos.{name}: 'required' must be a boolean")
+            if mirror["kind"] not in KINDS:
+                raise ConfigError(
+                    f"repos.{name}: unknown mirror kind {mirror['kind']!r}; known: {list(KINDS)}"
+                )
     return data
 
 
@@ -180,7 +187,8 @@ def check_repo(
             if not other.is_file():
                 f = Finding("missing", mirror["kind"], rel, other_rel, "file absent in counterpart")
             else:
-                mine, theirs = digest_file(path), digest_file(other)
+                kind = mirror["kind"]
+                mine, theirs = digest_file(path, kind), digest_file(other, kind)
                 if mine == theirs:
                     f = Finding("ok", mirror["kind"], rel, other_rel, mine[:16])
                 else:
@@ -219,7 +227,12 @@ def _apply_allowlist(finding: Finding, entries: list[dict[str, str]], repo: str)
 
 
 def render(report: Report) -> str:
-    lines = [f"compat check: protocol vs {report.repo}", f"rule: {RULE_TEXT}", ""]
+    lines = [
+        f"compat check: protocol vs {report.repo}",
+        f"rule {RULE_TEXT}",
+        f"rule {VECTOR_RULE_TEXT}",
+        "",
+    ]
     width = max((len(f.protocol_path) for f in report.findings), default=10)
     for f in report.findings:
         lines.append(f"{f.status:17} {f.kind:8} {f.protocol_path:{width}}  {f.detail}")
