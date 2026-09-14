@@ -1,12 +1,20 @@
 {
   "schema": "wakir-compat-allowlist/v1",
-  "entries": [
+  "entries": [],
+  "deselects": [
     {
       "repo": "runtime",
-      "path": "wakir_protocol/schemas/wakir-inclusion-proof-v1.json",
-      "reason": "runtime@main still carries the W2 draft (x-canonical-home prose, placeholder examples); protocol now holds the canonical copy. runtime re-mirrors it in its W4 compat PR, after which this entry is deleted.",
-      "until": "2026-09-30",
-      "tracking": "https://github.com/wakir-labs/wakir-protocol/pull/6"
+      "node_id": "wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_03_anchor_manifest_well_formed",
+      "reason": "Pins the byte digest of runtime's own copy of caveat-override-event-export.json. The overlay step of this gate replaces that file with protocol's copy, which differs only in pretty-print shape and in description strings — the members the canonical schema rule strips. Measured 2026-09-15: 5 passed on a pristine runtime@main, 2 failed after the overlay. Not stale drift; a byte pin against a file the gate is designed to replace. Resolution is runtime-side (re-pin on the canonical digest) and therefore Cross-Review Zone 3.",
+      "until": "2026-10-31",
+      "tracking": "https://github.com/wakir-labs/wakir-protocol/issues/8"
+    },
+    {
+      "repo": "runtime",
+      "node_id": "wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_04_schema_digest_fixture_round_trips",
+      "reason": "Same cause as COXSR-03: schema.sha256.bin pins the bytes of runtime's own schema file, which the overlay replaces. Its failure message claims the fixture is stale; measured 2026-09-15 that diagnosis is false for runtime@main. Resolution is runtime-side and therefore Cross-Review Zone 3.",
+      "until": "2026-10-31",
+      "tracking": "https://github.com/wakir-labs/wakir-protocol/issues/8"
     }
   ]
 }

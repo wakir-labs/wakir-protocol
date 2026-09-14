@@ -140,12 +140,13 @@ jobs:
             if [ -f "$f" ]; then selected="$selected $f"; else echo "skip (absent): $f"; fi
           done
           echo "selected:$selected"
-          # COXSR-03/04 pin the *byte* digest of runtime's own copy of
-          # caveat-override-event-export.json (OTS anchor fixture). A mirror
-          # that may differ in x-spdx-*/description cannot satisfy a byte pin;
-          # see docs/cross-repo-compat.md §4.1 (Zone 3 follow-up).
-          deselect="--deselect wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_03_anchor_manifest_well_formed \
-                    --deselect wirelang/tests/test_federation_caveat_override_event_export_schema.py::test_coxsr_04_schema_digest_fixture_round_trips"
+          # Deselects come from tooling/compat/compat-allowlist.json, never
+          # from this file: a --deselect written here carries no expiry and
+          # no author. The registry validates every entry against the
+          # calendar, so an expired deselect fails this step rather than
+          # quietly continuing to apply (ADR-0075 §3).
+          deselect="$(cd "$GITHUB_WORKSPACE" && python -m tooling.compat.allowlist --deselect-args runtime)"
+          echo "deselect flags from registry: ${deselect:-<none>}"
           # shellcheck disable=SC2086
           python -m pytest $selected $deselect -p no:cacheprovider -o addopts="" -q
 

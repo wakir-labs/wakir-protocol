@@ -6,8 +6,7 @@
       "clone": "https://github.com/wakir-labs/wakir-runtime",
       "mirrors": [
         {"kind": "schema", "protocol": "wakir_protocol/schemas/*.json", "other": "wirelang/schemas/", "required": true},
-        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": false,
-         "note": "runtime adds the mirror in its Phase-4 W4 compat PR; flip required to true afterwards"},
+        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": true},
         {"kind": "vector", "protocol": "tests/fixtures/jcs-leaf-vectors/*.json", "other": "tests/fixtures/jcs-leaf-vectors/", "required": true},
         {"kind": "vector", "protocol": "tests/fixtures/aip-document-vectors/*.json", "other": "tests/fixtures/aip-document-vectors/", "required": true},
         {"kind": "vector", "protocol": "tests/fixtures/bip32-vectors/*.json", "other": "tests/fixtures/bip32-vectors/", "required": true},
@@ -22,14 +21,13 @@
     "verify": {
       "clone": "https://github.com/wakir-labs/wakir-verify",
       "mirrors": [
-        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": false,
-         "note": "verify adds the mirror in its Phase-4 W4 compat PR; flip required to true afterwards"}
+        {"kind": "vector", "protocol": "tests/fixtures/proof-path-vectors/*.json", "other": "tests/fixtures/proof-path-vectors/", "required": true}
       ],
       "version_constants": []
     }
   },
   "excluded": [
-    {"path": "tests/fixtures/schema-registry/", "reason": "OTS schema-registry anchor fixture; digest pin is stale on both sides and the fixture is not on the proof path. Cross-Review Zone 3 open item (re-pin or delete)."},
+    {"path": "tests/fixtures/schema-registry/", "reason": "OTS schema-registry anchor fixture, not on the proof path. Measured 2026-09-15: the protocol-side pin IS stale (927eda59…/6907 bytes vs. live 69fb3bcb…/7183 bytes) and no test in this repository reads it; the runtime-side pin is current (b170ecbf…/6958 bytes, COXSR-03/04 pass on a pristine runtime@main). Cross-Review Zone 3 open item; see https://github.com/wakir-labs/wakir-protocol/issues/8."},
     {"path": "tests/fixtures/tv-w-1/, tests/fixtures/tv-w-2/, tests/fixtures/persona_definitions/", "reason": "protocol-only fixtures, no mirror"},
     {"path": "wakir_protocol/**/*.py", "reason": "Python sources are not JSON; code-level mirroring is out of scope for the schema-set gate"}
   ]
